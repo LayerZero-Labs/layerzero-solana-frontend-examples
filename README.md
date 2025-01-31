@@ -1,0 +1,1 @@
+Minimal setups to demonstrate how to use the `@layerzerolabs/oft-v2-solana-sdk` package in a frontend repo.
