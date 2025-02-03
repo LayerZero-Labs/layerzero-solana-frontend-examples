@@ -17,7 +17,9 @@ Notes on dependencies:
 - Using `@metaplex-foundation/umi` versions `1.0.0` or higher will not work will cause type errors.
 - Using `@solana/web3.js@2.0.0` or higher will result in an error due to the difference in the connection type between v1 and v2. 
 - However, through `@solana/wallet-adapter-react` there can be an import of `@solana/web3.js@^2.0.0`
-- To address this, we must override the package version in `package.json`
+- To address this, we must override the package version in `package.json`. The field name varies depending on the package manager you're using:
+
+  npm:
 
   ```
   "overrides": {
@@ -26,6 +28,19 @@ Notes on dependencies:
   ```
 
   Run `npm i` after the above change.
+
+
+  yarn:
+
+    ```
+  "resolutions": {
+    "@solana/web3.js": "^1.98.0"
+  },
+  ```
+
+  Run `yarn install` after the above change.
+
+
   Then, IMPORTANTLY: delete the `.next` folder to clear the cache. Without doing this, NextJs would still use `@solana/web3.js@^2.0.0` from the cache
   Finally, start back the dev server: `npm run dev`
 
