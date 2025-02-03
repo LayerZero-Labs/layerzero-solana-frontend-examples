@@ -9,7 +9,10 @@ This repo provides a minimal example for using `@layerzerolabs/oft-v2-solana-sdk
 
 Requirements
 - `@layerzerolabs/oft-v2-solana-sdk@^3.0.60`
+- `@layerzerolabs/lz-v2-utilities@^3.0.60`
+- `@layerzerolabs/lz-definitions@^3.0.60`
 - `@metaplex-foundation/umi@^0.9.2`
+- `@metaplex-foundation/umi-bundle-defaults^0.9.2`
 - `@solana/web3.js@^1`
 
 Notes on dependencies:
