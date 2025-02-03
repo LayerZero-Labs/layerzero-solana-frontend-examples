@@ -15,6 +15,13 @@ Requirements
 - `@metaplex-foundation/umi-bundle-defaults^0.9.2`
 - `@solana/web3.js@^1`
 
+For your convenience, a single `npm i` (subtitute with your choice of package manager) command:
+
+
+```
+npm i @layerzerolabs/oft-v2-solana-sdk@^3.0.60 @layerzerolabs/lz-v2-utilities@^3.0.60 @layerzerolabs/lz-definitions@^3.0.60 @metaplex-foundation/umi@^0.9.2 @metaplex-foundation/umi-bundle-defaults@^0.9.2 @solana/web3.js@^1
+```
+
 Notes on dependencies:
 
 - Using `@metaplex-foundation/umi` versions `1.0.0` or higher will not work will cause type errors.
