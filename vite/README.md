@@ -2,6 +2,8 @@
 
 ## Quickstart
 
+Also refer to https://docs.layerzero.network/v2/developers/solana/oft/sdk
+
 Requirements:
 
 - `@layerzerolabs/oft-v2-solana-sdk` version `3.0.57` or later
