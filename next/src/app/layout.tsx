@@ -3,7 +3,7 @@
 // import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SolanaWalletProvider } from "./SolanaWalletProvider";
+import { SolanaWalletProvider } from "../components/SolanaWalletProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

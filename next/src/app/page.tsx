@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { SolanaConnect } from "./SolanaConnect";
+import { SolanaConnect } from "../components/SolanaConnect";
 import OftQuote from "@/components/OftQuote";
 
 
