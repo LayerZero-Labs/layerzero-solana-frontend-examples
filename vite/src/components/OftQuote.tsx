@@ -90,23 +90,23 @@ export default function OftQuote() {
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Contract Addresses</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Sepolia OFT:</span> {SEPOLIA_OFT_ADDRESS}
+            <span className="font-medium">Sepolia OFT:</span> <span className="font-bold">{SEPOLIA_OFT_ADDRESS}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana OFT Mint:</span> {SOLANA_OFT_MINT_ADDRESS}
+            <span className="font-medium">Solana OFT Mint:</span> <span className="font-bold">{SOLANA_OFT_MINT_ADDRESS}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana Escrow:</span> {SOLANA_ESCROW_ADDRESS}
+            <span className="font-medium">Solana Escrow:</span> <span className="font-bold">{SOLANA_ESCROW_ADDRESS}</span>
           </p>
         </div>
 
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Addresses</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Sepolia (Hardcoded):</span> {SEPOLIA_WALLET}
+            <span className="font-medium">Sepolia (Hardcoded):</span> <span className="font-bold">{SEPOLIA_WALLET}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Connected Solana:</span> {wallet.publicKey?.toBase58()}
+            <span className="font-medium">Connected Solana:</span> <span className="font-bold">{wallet.publicKey?.toBase58()}</span>
           </p>
         </div>
 
