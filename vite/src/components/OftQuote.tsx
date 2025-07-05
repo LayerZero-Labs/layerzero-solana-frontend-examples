@@ -83,7 +83,7 @@ export default function OftQuote() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        OFT Quote
+        Solana → EVM Transfer
       </h2>
 
       <div className="space-y-4 mb-6">
