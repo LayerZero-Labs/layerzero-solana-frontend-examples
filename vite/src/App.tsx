@@ -8,7 +8,7 @@ function App() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-            LayerZero Solana OFT SDK
+            LayerZero Solana OFT SDK Example
           </h1>
           <SolanaWalletProvider>
             <div className="space-y-6">
