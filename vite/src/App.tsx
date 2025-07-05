@@ -1,5 +1,7 @@
 import OftQuote from "./components/OftQuote";
 import EvmOftSend from "./components/EvmOftSend";
+import SolanaOftCard from "./components/SolanaOftCard";
+import EvmOftCard from "./components/EvmOftCard";
 import { SolanaWalletProvider } from "./components/SolanaWalletProvider";
 import { SolanaConnect } from "./components/SolanaConnect";
 import { EthereumConnect } from "./components/EthereumConnect";
@@ -19,11 +21,19 @@ function App() {
             </p>
             
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <SolanaWalletProvider>
-                <SolanaConnect />
-              </SolanaWalletProvider>
+              <div className="space-y-6">
+                <SolanaWalletProvider>
+                  <SolanaConnect />
+                </SolanaWalletProvider>
+                <SolanaWalletProvider>
+                  <SolanaOftCard />
+                </SolanaWalletProvider>
+              </div>
               
-              <EthereumConnect />
+              <div className="space-y-6">
+                <EthereumConnect />
+                <EvmOftCard />
+              </div>
             </div>
             
             <div className="grid lg:grid-cols-2 gap-8">
