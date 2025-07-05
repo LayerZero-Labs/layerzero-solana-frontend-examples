@@ -1,6 +1,6 @@
 "use client";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { useChainId } from "wagmi";
+import { useChainId, useAccount } from "wagmi";
 import { oft } from "@layerzerolabs/oft-v2-solana-sdk";
 import { useState, useEffect } from "react";
 import { EndpointId } from "@layerzerolabs/lz-definitions";
@@ -26,6 +26,7 @@ export default function OftQuote() {
   const wallet = useWallet();
   const { connection } = useConnection();
   const chainId = useChainId();
+  const { address: ethereumAddress, isConnected: isEthereumConnected } = useAccount();
 
   const [isClient, setIsClient] = useState(false);
   const [amount, setAmount] = useState('0.1');
@@ -46,7 +47,12 @@ export default function OftQuote() {
 
   async function onClickQuote() {
     if (!wallet.connected || !wallet.publicKey) {
-      console.error("Wallet is not connected or publicKey is missing.");
+      console.error("Solana wallet is not connected or publicKey is missing.");
+      return;
+    }
+
+    if (!isEthereumConnected || !ethereumAddress) {
+      console.error("Ethereum wallet is not connected or address is missing.");
       return;
     }
 
@@ -57,11 +63,14 @@ export default function OftQuote() {
     const oftStoreInfo = await oft.accounts.fetchOFTStore(umi, storePda);
     const escrowPk = new PublicKey(oftStoreInfo.tokenEscrow);
     console.log("escrowPk", escrowPk.toBase58());
-    const recipientAddressBytes32 = addressToBytes32(CONTRACTS.SEPOLIA_WALLET);
+    
+    // Use the connected ethereum wallet address as the destination
+    const recipientAddressBytes32 = addressToBytes32(ethereumAddress);
 
     const amountLamports = BigInt(Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL));
 
     console.log("Using EndpointId:", toEid, "for chainId:", chainId);
+    console.log("Destination address:", ethereumAddress);
 
     const { nativeFee } = await oft.quote(
       umi.rpc,
@@ -105,10 +114,10 @@ export default function OftQuote() {
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Transfer Details</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Destination ({getNetworkName(chainId)}):</span> <span className="font-mono text-xs">{CONTRACTS.SEPOLIA_WALLET}</span>
+            <span className="font-medium">Destination ({getNetworkName(chainId)}):</span> <span className="font-mono text-xs">{ethereumAddress || 'No Ethereum wallet connected'}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            <span className="font-medium">Chain ID:</span> {chainId} | <span className="font-medium">Endpoint ID:</span> {toEid}
+            <span className="font-medium">Destination Endpoint ID:</span> {toEid}
           </p>
         </div>
 
@@ -131,10 +140,18 @@ export default function OftQuote() {
       <button 
         onClick={onClickQuote}
         className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={!wallet.connected || !wallet.publicKey || !amount}
+        disabled={!wallet.connected || !wallet.publicKey || !amount || !isEthereumConnected || !ethereumAddress}
       >
         Get OFT Quote
       </button>
+
+      {!isEthereumConnected && (
+        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+            Please connect your Ethereum wallet to set the destination address.
+          </p>
+        </div>
+      )}
 
       {nativeFee !== null && (
         <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
