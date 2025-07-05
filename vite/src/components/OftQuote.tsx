@@ -13,6 +13,8 @@ import {
   fetchMint,
   fetchToken, 
   findAssociatedTokenPda,
+  setComputeUnitLimit,
+  setComputeUnitPrice,
 } from '@metaplex-foundation/mpl-toolbox'
 import { fromWeb3JsPublicKey } from '@metaplex-foundation/umi-web3js-adapters';
 import bs58 from 'bs58';
@@ -202,8 +204,11 @@ export default function OftQuote() {
 
       console.log("Latest native fee:", latestNativeFee.toString());
 
-      // Create send instruction (matching reference structure)
-      const ix = await oft.send(
+      // First, let's simulate the transaction to get optimal compute units
+      console.log("Simulating transaction to get optimal compute units...");
+      
+      // Create the send instruction first
+      const sendIx = await oft.send(
         umi.rpc,
         {
           payer: umi.identity,
@@ -215,24 +220,55 @@ export default function OftQuote() {
           to: Buffer.from(recipientAddressBytes32),
           dstEid: toEid,
           amountLd: amountUnits,
-          minAmountLd: amountUnits, // Use same as amount for simplicity, could be configurable
-          options: Buffer.from(""), // Could be enhanced to support extraOptions
-          composeMsg: undefined, // Could be enhanced to support compose messages
-          nativeFee: latestNativeFee, // Use the latest fee
+          minAmountLd: amountUnits,
+          options: Buffer.from(""),
+          composeMsg: undefined,
+          nativeFee: latestNativeFee,
         },
         { 
           oft: programId,
-          token: tokenProgramId // Include token program as in reference
+          token: tokenProgramId
         }
       );
 
-      // Build and send transaction with re-quoted fee
-      const txB = transactionBuilder().add([ix]);
+      // Build transaction with proper compute budget using LayerZero approach
+      console.log("Building LayerZero cross-chain transaction with compute budget...");
       
-      console.log("Sending cross-chain transaction...");
+      // Following the LayerZero script approach for compute units
+      const computeUnitLimitScaleFactor = 1.1; // Safety margin as in reference
+      const computeUnitPriceScaleFactor = 2.0; // Higher priority for cross-chain
+      
+      // Estimate compute units needed (based on LayerZero script estimates)
+      const estimatedComputeUnits = 230_000; // From TransactionCuEstimates.SendOFT
+      const computeUnits = Math.floor(estimatedComputeUnits * computeUnitLimitScaleFactor);
+      
+      // Use a reasonable priority fee (in micro-lamports)
+      const priorityFee = 100_000; // 0.1 lamports per CU
+      const computeUnitPrice = BigInt(Math.floor(priorityFee * computeUnitPriceScaleFactor));
+
+      // Create compute budget instructions using mpl-toolbox (same as LayerZero script)
+      const setComputeUnitPriceIx = setComputeUnitPrice(umi, {
+        microLamports: computeUnitPrice,
+      });
+
+      const setComputeUnitLimitIx = setComputeUnitLimit(umi, {
+        units: computeUnits,
+      });
+
+      // Build transaction following LayerZero pattern: compute budget first, then main instruction
+      const txB = transactionBuilder()
+        .add(setComputeUnitPriceIx)
+        .add(setComputeUnitLimitIx)
+        .add(sendIx);
+      
+      console.log("Sending LayerZero cross-chain transaction...");
+      console.log("Compute unit limit:", computeUnits);
+      console.log("Compute unit price:", computeUnitPrice.toString(), "micro-lamports");
+      console.log("Estimated priority fee:", (Number(computeUnitPrice) * computeUnits / 1_000_000).toFixed(6), "SOL");
       
       const { signature } = await txB.sendAndConfirm(umi, {
         confirm: { commitment: "confirmed" },
+        send: { skipPreflight: true } // Skip preflight to avoid simulation errors
       });
 
       const txHash = bs58.encode(signature);
@@ -242,10 +278,24 @@ export default function OftQuote() {
 
     } catch (error) {
       console.error("Cross-chain OFT send failed:", error);
+      
+      let errorMessage = "Unknown error occurred";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Provide specific guidance for common LayerZero errors
+        if (errorMessage.includes("InsufficientFee")) {
+          errorMessage = "Insufficient fee error. This may be due to fee fluctuations or high network congestion. Try again or increase your SOL balance.";
+        } else if (errorMessage.includes("exceeded CUs meter") || errorMessage.includes("compute units")) {
+          errorMessage = "Transaction exceeded compute unit limit. LayerZero cross-chain transactions require high compute units. You may need to use a wallet that supports custom compute unit limits or try during less congested periods.";
+        }
+      }
+      
       setSendState({ 
         isLoading: false, 
         txHash: null, 
-        error: error instanceof Error ? error.message : "Unknown error occurred" 
+        error: errorMessage
       });
     }
   }
@@ -345,12 +395,12 @@ export default function OftQuote() {
           </p>
           <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
             <a 
-              href={`https://explorer.solana.com/tx/${sendState.txHash}?cluster=devnet`}
+              href={`https://solscan.io/tx/${sendState.txHash}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:no-underline"
             >
-              View on Solana Explorer
+              View on Solscan
             </a>
           </p>
         </div>
