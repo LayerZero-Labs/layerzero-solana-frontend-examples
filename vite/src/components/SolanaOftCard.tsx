@@ -37,32 +37,16 @@ export default function SolanaOftCard() {
   // ------------------------------------------------------------
   // Program‑level constants
   // ------------------------------------------------------------
-  const { tokenMint, programId, escrow } = useMemo(() => {
+  const { tokenMint, programId, oftStore } = useMemo(() => {
     try {
-      const FALLBACK_ADDRESSES = {
-        SOLANA_PROGRAM_ADDRESS: "GAYKSbSP6S14sg9SEp9qtdQmhgpSL86qUK53r8svofc",
-        SOLANA_OFT_MINT_ADDRESS: "JCC3neA7C6x7vi5aizug5zKmi9NyQ62vCAaGW8ytmamq",
-        SOLANA_ESCROW_ADDRESS: "BdsusD4mCRpwG66mP8zcmSXAG4yvpJKWLutcoGZSVVJD",
-      };
-
-      const mintAddress =
-        CONTRACTS.SOLANA_OFT_MINT_ADDRESS ||
-        FALLBACK_ADDRESSES.SOLANA_OFT_MINT_ADDRESS;
-      const programAddress =
-        CONTRACTS.SOLANA_PROGRAM_ADDRESS ||
-        FALLBACK_ADDRESSES.SOLANA_PROGRAM_ADDRESS;
-      const escrowAddress =
-        CONTRACTS.SOLANA_ESCROW_ADDRESS ||
-        FALLBACK_ADDRESSES.SOLANA_ESCROW_ADDRESS;
-
       return {
-        tokenMint: new PublicKey(mintAddress),
-        programId: new PublicKey(programAddress),
-        escrow: new PublicKey(escrowAddress),
+        tokenMint: new PublicKey(CONTRACTS.SOLANA_OFT_MINT_ADDRESS),
+        programId: new PublicKey(CONTRACTS.SOLANA_PROGRAM_ADDRESS),
+        oftStore: new PublicKey(CONTRACTS.SOLANA_OFT_STORE_ADDRESS),
       };
     } catch (e) {
       console.error("Error parsing addresses", e);
-      return { tokenMint: null, programId: null, escrow: null } as const;
+      return { tokenMint: null, programId: null, oftStore: null } as const;
     }
   }, []);
 
@@ -158,7 +142,7 @@ export default function SolanaOftCard() {
   // Mint
   // ------------------------------------------------------------
   const handleMint = useCallback(async () => {
-    if (!wallet?.publicKey || !tokenMint || !programId || !escrow) {
+    if (!wallet?.publicKey || !tokenMint || !programId || !oftStore) {
       setError("Wallet not connected or contracts not initialised");
       return;
     }
@@ -173,11 +157,6 @@ export default function SolanaOftCard() {
 
       const userTokenAccount = await createAssociatedTokenAccount(
         wallet.publicKey
-      );
-
-      const [oftStore] = PublicKey.findProgramAddressSync(
-        [Buffer.from("oft_store"), escrow.toBuffer()],
-        programId
       );
 
       const [dailyMintLimit] = PublicKey.findProgramAddressSync(
@@ -217,7 +196,7 @@ export default function SolanaOftCard() {
     wallet?.publicKey,
     tokenMint,
     programId,
-    escrow,
+    oftStore,
     getProvider,
     getProgram,
     createAssociatedTokenAccount,
@@ -235,7 +214,7 @@ export default function SolanaOftCard() {
   // ------------------------------------------------------------
   // UI
   // ------------------------------------------------------------
-  if (!tokenMint || !programId || !escrow) {
+  if (!tokenMint || !programId || !oftStore) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -296,6 +275,12 @@ export default function SolanaOftCard() {
             <span className="font-medium">Mint:</span>
             <span className="font-mono text-xs ml-1">{tokenMint.toString()}</span>
           </p>
+          {oftStore && (
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              <span className="font-medium">OFT Store:</span>
+              <span className="font-mono text-xs ml-1">{oftStore.toString()}</span>
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
