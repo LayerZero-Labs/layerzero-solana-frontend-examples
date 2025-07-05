@@ -7,7 +7,7 @@ import { publicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { addressToBytes32 } from "@layerzerolabs/lz-v2-utilities";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { CONTRACTS } from "../config/contracts";
 
 const amount = 0.1 * LAMPORTS_PER_SOL;
@@ -38,7 +38,12 @@ export default function OftQuote() {
     }
 
     const mint = publicKey(CONTRACTS.SOLANA_OFT_MINT_ADDRESS);
+    const storePda = publicKey(CONTRACTS.SOLANA_OFT_STORE_ADDRESS);
 
+    // Fetch OFT store information to get the escrow address
+    const oftStoreInfo = await oft.accounts.fetchOFTStore(umi, storePda);
+    const escrowPk = new PublicKey(oftStoreInfo.tokenEscrow);
+    console.log("escrowPk", escrowPk.toBase58());
     const recipientAddressBytes32 = addressToBytes32(CONTRACTS.SEPOLIA_WALLET);
 
     const { nativeFee } = await oft.quote(
@@ -46,7 +51,7 @@ export default function OftQuote() {
       {
         payer: publicKey(wallet.publicKey),
         tokenMint: mint,
-        tokenEscrow: publicKey(CONTRACTS.SOLANA_ESCROW_ADDRESS),
+        tokenEscrow: publicKey(escrowPk),
       },
       {
         payInLzToken: false,
@@ -80,7 +85,7 @@ export default function OftQuote() {
             <span className="font-medium">Solana OFT Mint:</span> <span className="font-mono text-xs">{CONTRACTS.SOLANA_OFT_MINT_ADDRESS}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana Escrow:</span> <span className="font-mono text-xs">{CONTRACTS.SOLANA_ESCROW_ADDRESS}</span>
+            <span className="font-medium">Solana OFT Store:</span> <span className="font-mono text-xs">{CONTRACTS.SOLANA_OFT_STORE_ADDRESS}</span>
           </p>
         </div>
 
