@@ -393,16 +393,24 @@ export default function OftQuote() {
             <span className="font-medium">Transaction Hash:</span> 
             <span className="font-mono text-xs ml-2">{sendState.txHash}</span>
           </p>
-          <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
+          <div className="flex gap-4 mt-2">
             <a 
               href={`https://solscan.io/tx/${sendState.txHash}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:no-underline"
+              className="text-sm text-blue-800 dark:text-blue-200 underline hover:no-underline"
             >
               View on Solscan
             </a>
-          </p>
+            <a 
+              href={`https://testnet.layerzeroscan.com/tx/${sendState.txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-blue-800 dark:text-blue-200 underline hover:no-underline"
+            >
+              View on LayerZero Scan
+            </a>
+          </div>
         </div>
       )}
     </div>
