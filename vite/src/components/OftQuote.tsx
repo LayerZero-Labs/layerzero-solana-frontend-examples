@@ -9,14 +9,14 @@ import { addressToBytes32 } from "@layerzerolabs/lz-v2-utilities";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-const SEPOLIA_OFT_ADDRESS = import.meta.env.VITE_SEPOLIA_OFT_ADDRESS;
-const SOLANA_OFT_MINT_ADDRESS = import.meta.env.VITE_SOLANA_OFT_MINT_ADDRESS;
-const SEPOLIA_WALLET = import.meta.env.VITE_SEPOLIA_WALLET; // TODO: unhardcode, use address from reown/appkit
+const SEPOLIA_OFT_ADDRESS = import.meta.env.VITE_SEPOLIA_OFT_ADDRESS || '0x2e42D5b38559b209b30815B692AC98641e7560b2';
+const SOLANA_OFT_MINT_ADDRESS = import.meta.env.VITE_SOLANA_OFT_MINT_ADDRESS || 'JCC3neA7C6x7vi5aizug5zKmi9NyQ62vCAaGW8ytmamq';
+const SEPOLIA_WALLET = import.meta.env.VITE_SEPOLIA_WALLET || '2uWbuRdAPxwU6XJ4mF3DfFL3vvrqE2qwbkUqYN2YmYBF';
 
 const amount = 0.1 * LAMPORTS_PER_SOL;
 
-const SOLANA_ESCROW_ADDRESS = import.meta.env.VITE_SOLANA_ESCROW_ADDRESS;
-const SOLANA_PROGRAM_ADDRESS = import.meta.env.VITE_SOLANA_PROGRAM_ADDRESS;
+const SOLANA_ESCROW_ADDRESS = import.meta.env.VITE_SOLANA_ESCROW_ADDRESS || 'BdsusD4mCRpwG66mP8zcmSXAG4yvpJKWLutcoGZSVVJD';
+const SOLANA_PROGRAM_ADDRESS = import.meta.env.VITE_SOLANA_PROGRAM_ADDRESS || 'GAYKSbSP6S14sg9SEp9qtdQmhgpSL86qUK53r8svofc';
 
 const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
@@ -90,23 +90,23 @@ export default function OftQuote() {
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Contract Addresses</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Sepolia OFT:</span> <span className="font-bold">{SEPOLIA_OFT_ADDRESS}</span>
+            <span className="font-medium">OP Sepolia OFT:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana OFT Mint:</span> <span className="font-bold">{SOLANA_OFT_MINT_ADDRESS}</span>
+            <span className="font-medium">Solana OFT Mint:</span> <span className="font-mono text-xs">{SOLANA_OFT_MINT_ADDRESS}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana Escrow:</span> <span className="font-bold">{SOLANA_ESCROW_ADDRESS}</span>
+            <span className="font-medium">Solana Escrow:</span> <span className="font-mono text-xs">{SOLANA_ESCROW_ADDRESS}</span>
           </p>
         </div>
 
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Addresses</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Transfer Details</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Sepolia (Hardcoded):</span> <span className="font-bold">{SEPOLIA_WALLET}</span>
+            <span className="font-medium">Destination (OP Sepolia):</span> <span className="font-mono text-xs">{SEPOLIA_WALLET}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Connected Solana:</span> <span className="font-bold">{wallet.publicKey?.toBase58()}</span>
+            <span className="font-medium">Connected Solana:</span> <span className="font-mono text-xs">{wallet.publicKey?.toBase58()}</span>
           </p>
         </div>
 

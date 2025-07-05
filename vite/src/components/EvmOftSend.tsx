@@ -5,7 +5,7 @@ import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
 import { myOftMockAbi } from '../evm/MyOFTMock'
 
-const SEPOLIA_OFT_ADDRESS = import.meta.env.VITE_SEPOLIA_OFT_ADDRESS as `0x${string}`
+const SEPOLIA_OFT_ADDRESS = (import.meta.env.VITE_SEPOLIA_OFT_ADDRESS || '0x2e42D5b38559b209b30815B692AC98641e7560b2') as `0x${string}`
 
 export default function EvmOftSend() {
   const { address, isConnected } = useAccount()
@@ -108,7 +108,7 @@ export default function EvmOftSend() {
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Contract Info</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Sepolia OFT:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
+            <span className="font-medium">OP Sepolia OFT:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
           </p>
         </div>
 
