@@ -4,8 +4,9 @@ import { parseEther, formatEther } from 'viem'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
 import { myOftMockAbi } from '../evm/MyOFTMock'
+import { CONTRACTS } from '../config/contracts'
 
-const SEPOLIA_OFT_ADDRESS = (import.meta.env.VITE_SEPOLIA_OFT_ADDRESS || '0x2e42D5b38559b209b30815B692AC98641e7560b2') as `0x${string}`
+const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
 export default function EvmOftSend() {
   const { address, isConnected } = useAccount()
