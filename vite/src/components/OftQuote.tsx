@@ -1,5 +1,5 @@
 "use client";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { oft } from "@layerzerolabs/oft-v2-solana-sdk";
 import { useState, useEffect } from "react";
 import { EndpointId } from "@layerzerolabs/lz-definitions";
@@ -16,6 +16,7 @@ const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
 export default function OftQuote() {
   const wallet = useWallet();
+  const { connection } = useConnection();
 
   const [isClient, setIsClient] = useState(false);
   const [nativeFee, setNativeFee] = useState<bigint | null>(null);
@@ -26,8 +27,8 @@ export default function OftQuote() {
 
   if (!isClient) return null; // Prevent rendering mismatched content
 
-  const rpcUrl = "https://api.devnet.solana.com";
-  const umi = createUmi(rpcUrl);
+  // Use the connection from the wallet provider instead of hardcoded RPC
+  const umi = createUmi(connection.rpcEndpoint);
   umi.use(walletAdapterIdentity(wallet));
 
   async function onClickQuote() {
@@ -90,6 +91,9 @@ export default function OftQuote() {
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             <span className="font-medium">Connected Solana:</span> <span className="font-mono text-xs">{wallet.publicKey?.toBase58()}</span>
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">RPC Endpoint:</span> <span className="font-mono text-xs">{connection.rpcEndpoint}</span>
           </p>
         </div>
 

@@ -10,8 +10,8 @@ type Props = {
   readonly children: React.ReactNode;
 };
 
-// Mainnet-beta is the actuall mainnet (as of writing)
-const endpoint = clusterApiUrl('mainnet-beta');
+// Use environment variable or default to devnet to match contract deployment
+const endpoint = import.meta.env.VITE_SOLANA_RPC_ENDPOINT || clusterApiUrl('devnet');
 
 const wallets = [new PhantomWalletAdapter()];
 
