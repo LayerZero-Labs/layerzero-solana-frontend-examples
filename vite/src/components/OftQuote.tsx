@@ -3,7 +3,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { oft } from "@layerzerolabs/oft-v2-solana-sdk";
 import { useState, useEffect } from "react";
 import { EndpointId } from "@layerzerolabs/lz-definitions";
-import { publicKey, transactionBuilder } from "@metaplex-foundation/umi";
+import { publicKey } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { addressToBytes32 } from "@layerzerolabs/lz-v2-utilities";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
@@ -18,7 +18,6 @@ const amount = 0.1 * LAMPORTS_PER_SOL;
 const SOLANA_ESCROW_ADDRESS = import.meta.env.VITE_SOLANA_ESCROW_ADDRESS;
 const SOLANA_PROGRAM_ADDRESS = import.meta.env.VITE_SOLANA_PROGRAM_ADDRESS;
 
-const fromEid = EndpointId.SOLANA_V2_TESTNET;
 const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
 export default function OftQuote() {
@@ -82,25 +81,57 @@ export default function OftQuote() {
   }
 
   return (
-    <div>
-      <div />
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        OFT Quote
+      </h2>
 
-      <p>Sepolia OFT Token Contract Address: {SEPOLIA_OFT_ADDRESS}</p>
-      <p>Solana OFT Mint Address: {SOLANA_OFT_MINT_ADDRESS}</p>
-      <p>Solana Escrow Address: {SOLANA_ESCROW_ADDRESS}</p>
+      <div className="space-y-4 mb-6">
+        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Contract Addresses</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">Sepolia OFT:</span> {SEPOLIA_OFT_ADDRESS}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">Solana OFT Mint:</span> {SOLANA_OFT_MINT_ADDRESS}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">Solana Escrow:</span> {SOLANA_ESCROW_ADDRESS}
+          </p>
+        </div>
 
-      <div />
+        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Addresses</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">Sepolia (Hardcoded):</span> {SEPOLIA_WALLET}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">Connected Solana:</span> {wallet.publicKey?.toBase58()}
+          </p>
+        </div>
 
-      <p>(Harcoded) Sepolia address: {SEPOLIA_WALLET}</p>
-      <p>Connected Solana address: {wallet.publicKey?.toBase58()} </p>
+        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium">Amount (Hardcoded):</span> {amount}
+          </p>
+        </div>
+      </div>
 
-      <div />
+      <button 
+        onClick={onClickQuote}
+        className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!wallet.connected || !wallet.publicKey}
+      >
+        Get OFT Quote
+      </button>
 
-      <p>(Hardcoded) Amount: {amount}</p>
-
-      <button onClick={onClickQuote}>OFT Quote</button>
-
-      <p>Quote result (nativeFee): {nativeFee ? nativeFee.toString() : "null"}</p>
+      {nativeFee !== null && (
+        <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+          <p className="text-sm text-green-800 dark:text-green-200">
+            <span className="font-medium">Quote Result (Native Fee):</span> {nativeFee.toString()}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
