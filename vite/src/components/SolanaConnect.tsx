@@ -31,8 +31,8 @@ export const SolanaConnect: FC = () => {
             }
           `}
         </style>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Wallet Connection
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          {connected ? "Solana Wallet Connected" : "Solana Wallet"}
         </h2>
         <div className="wallet-buttons-container flex items-center gap-4 flex-wrap">
           <WalletMultiButton />
