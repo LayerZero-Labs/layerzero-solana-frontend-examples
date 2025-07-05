@@ -3,6 +3,7 @@ import { SolanaWalletProvider } from "./components/SolanaWalletProvider";
 import { SolanaConnect } from "./components/SolanaConnect";
 import { EthereumConnect } from "./components/EthereumConnect";
 import { WagmiProviderWrapper } from "./components/WagmiProvider";
+import { EndpointId } from "@layerzerolabs/lz-definitions";
 
 function App() {
   return (
@@ -13,7 +14,10 @@ function App() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
               LayerZero Solana OFT SDK Example
             </h1>
-            
+            <p>
+              {/* This is just to show how to use EndpointId */}
+              {EndpointId.SOLANA_V2_TESTNET}
+            </p>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <SolanaWalletProvider>
                 <SolanaConnect />
