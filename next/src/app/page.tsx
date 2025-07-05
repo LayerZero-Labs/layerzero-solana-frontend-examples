@@ -9,6 +9,7 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true); // Set to true when component mounts (client-side)
+    document.title = "LayerZero Frontend Example"; // Set page title
   }, []);
 
   if (!isClient) return null; // Prevent rendering mismatched content
