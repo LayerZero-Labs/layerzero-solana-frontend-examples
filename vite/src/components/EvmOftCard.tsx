@@ -98,9 +98,6 @@ export default function EvmOftCard() {
           <p className="text-2xl font-bold text-gray-900 dark:text-white">
             {isCorrectNetwork && balance ? formatEther(balance) : '0'} OFT
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            <span className="font-medium">Network:</span> <span className="font-medium text-blue-600 dark:text-blue-400">OP Sepolia</span>
-          </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             <span className="font-medium">Contract:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
           </p>

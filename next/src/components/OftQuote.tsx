@@ -90,7 +90,6 @@ export default function OftQuote() {
 
       <p>Sepolia OFT Token Contract Address: {SEPOLIA_OFT_ADDRESS}</p>
       <p>Solana OFT Mint Address: {SOLANA_OFT_MINT_ADDRESS}</p>
-      <p>Solana Escrow Address: {SOLANA_ESCROW_ADDRESS}</p>
 
       <div className="my-4" />
 

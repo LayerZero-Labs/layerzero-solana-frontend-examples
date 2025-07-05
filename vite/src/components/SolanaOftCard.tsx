@@ -279,6 +279,16 @@ export default function SolanaOftCard() {
               {isLoadingBalance ? "Loading..." : "Refresh"}
             </button>
           </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            <span className="font-medium">Mint:</span>
+            <span className="font-mono text-xs ml-1">{tokenMint.toString()}</span>
+          </p>
+          {oftStore && (
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              <span className="font-medium">OFT Store:</span>
+              <span className="font-mono text-xs ml-1">{oftStore.toString()}</span>
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -291,7 +301,7 @@ export default function SolanaOftCard() {
           </button>
 
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Using LayerZero OFT Program
+            Using the OFT Program's mock mint function (public)
           </p>
         </div>
       </div>

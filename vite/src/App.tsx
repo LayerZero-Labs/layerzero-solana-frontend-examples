@@ -20,28 +20,54 @@ function App() {
               Transfer tokens between Ethereum and Solana using LayerZero
             </p>
             
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="space-y-6">
-                <SolanaWalletProvider>
-                  <SolanaConnect />
-                </SolanaWalletProvider>
-                <SolanaWalletProvider>
-                  <SolanaOftCard />
-                </SolanaWalletProvider>
+            {/* Wallet Section */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                Wallet
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <SolanaWalletProvider>
+                    <SolanaConnect />
+                  </SolanaWalletProvider>
+                </div>
+                
+                <div className="space-y-6">
+                  <EthereumConnect />
+                </div>
               </div>
-              
-              <div className="space-y-6">
-                <EthereumConnect />
-                <EvmOftCard />
+            </div>
+
+            {/* OFT Section */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                OFT
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <SolanaWalletProvider>
+                    <SolanaOftCard />
+                  </SolanaWalletProvider>
+                </div>
+                
+                <div className="space-y-6">
+                  <EvmOftCard />
+                </div>
               </div>
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-8">
-              <SolanaWalletProvider>
-                <OftQuote />
-              </SolanaWalletProvider>
-              
-              <EvmOftSend />
+            {/* Send Section */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                Send
+              </h2>
+              <div className="grid lg:grid-cols-2 gap-8">
+                <SolanaWalletProvider>
+                  <OftQuote />
+                </SolanaWalletProvider>
+                
+                <EvmOftSend />
+              </div>
             </div>
           </div>
         </div>
