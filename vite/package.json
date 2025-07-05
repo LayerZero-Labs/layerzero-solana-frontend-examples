@@ -21,7 +21,7 @@
     }
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.31.1",
+    "@coral-xyz/anchor": "^0.29.0",
     "@layerzerolabs/lz-definitions": "^3.0.71",
     "@layerzerolabs/lz-v2-utilities": "^3.0.71",
     "@layerzerolabs/oft-v2-solana-sdk": "^3.0.71",

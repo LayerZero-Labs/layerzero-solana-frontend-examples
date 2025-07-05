@@ -14,16 +14,25 @@ export const DEFAULT_CONTRACTS = {
 } as const
 
 // Environment variable getters with fallbacks
-export const getContractAddresses = () => ({
-  // Solana addresses
-  SOLANA_PROGRAM_ADDRESS: import.meta.env.VITE_SOLANA_PROGRAM_ADDRESS || DEFAULT_CONTRACTS.SOLANA_PROGRAM_ID,
-  SOLANA_OFT_MINT_ADDRESS: import.meta.env.VITE_SOLANA_OFT_MINT_ADDRESS || DEFAULT_CONTRACTS.SOLANA_MINT,
-  SOLANA_ESCROW_ADDRESS: import.meta.env.VITE_SOLANA_ESCROW_ADDRESS || DEFAULT_CONTRACTS.SOLANA_ESCROW,
-  
-  // OP Sepolia addresses
-  SEPOLIA_OFT_ADDRESS: import.meta.env.VITE_SEPOLIA_OFT_ADDRESS || DEFAULT_CONTRACTS.OP_SEPOLIA_OFT,
-  SEPOLIA_WALLET: import.meta.env.VITE_SEPOLIA_WALLET || DEFAULT_CONTRACTS.DEFAULT_SEPOLIA_WALLET,
-})
+export const getContractAddresses = () => {
+  // Use default values if environment variables are not defined or empty
+  const solanaProgram = import.meta.env?.VITE_SOLANA_PROGRAM_ADDRESS || DEFAULT_CONTRACTS.SOLANA_PROGRAM_ID;
+  const solanaMint = import.meta.env?.VITE_SOLANA_OFT_MINT_ADDRESS || DEFAULT_CONTRACTS.SOLANA_MINT;
+  const solanaEscrow = import.meta.env?.VITE_SOLANA_ESCROW_ADDRESS || DEFAULT_CONTRACTS.SOLANA_ESCROW;
+  const sepoliaOft = import.meta.env?.VITE_SEPOLIA_OFT_ADDRESS || DEFAULT_CONTRACTS.OP_SEPOLIA_OFT;
+  const sepoliaWallet = import.meta.env?.VITE_SEPOLIA_WALLET || DEFAULT_CONTRACTS.DEFAULT_SEPOLIA_WALLET;
+
+  return {
+    // Solana addresses
+    SOLANA_PROGRAM_ADDRESS: solanaProgram,
+    SOLANA_OFT_MINT_ADDRESS: solanaMint,
+    SOLANA_ESCROW_ADDRESS: solanaEscrow,
+    
+    // OP Sepolia addresses
+    SEPOLIA_OFT_ADDRESS: sepoliaOft,
+    SEPOLIA_WALLET: sepoliaWallet,
+  };
+}
 
 // Typed contract addresses
 export const CONTRACTS = getContractAddresses() 

@@ -1,8 +1,18 @@
-import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { useState, useEffect } from "react";
-import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
-import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, getAccount, TokenAccountNotFoundError, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { BorshInstructionCoder } from "@coral-xyz/anchor";
+import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
+import {
+  getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
+  getAccount,
+  TokenAccountNotFoundError,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
+import { AnchorProvider, Program, Idl } from "@coral-xyz/anchor";
 import { CONTRACTS } from "../config/contracts";
 import oftIdl from "../solana/idl/oft.json";
 
@@ -13,145 +23,143 @@ interface TokenBalance {
 }
 
 export default function SolanaOftCard() {
-  const wallet = useWallet();
+  const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [isMinting, setIsMinting] = useState(false);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [balance, setBalance] = useState<TokenBalance>({
     amount: 0,
     decimals: 6,
-    uiAmount: 0
+    uiAmount: 0,
   });
   const [error, setError] = useState<string | null>(null);
 
-  const tokenMint = new PublicKey(CONTRACTS.SOLANA_OFT_MINT_ADDRESS);
-  const programId = new PublicKey(CONTRACTS.SOLANA_PROGRAM_ADDRESS);
-  const escrow = new PublicKey(CONTRACTS.SOLANA_ESCROW_ADDRESS);
+  // ------------------------------------------------------------
+  // Program‑level constants
+  // ------------------------------------------------------------
+  const { tokenMint, programId, escrow } = useMemo(() => {
+    try {
+      const FALLBACK_ADDRESSES = {
+        SOLANA_PROGRAM_ADDRESS: "GAYKSbSP6S14sg9SEp9qtdQmhgpSL86qUK53r8svofc",
+        SOLANA_OFT_MINT_ADDRESS: "JCC3neA7C6x7vi5aizug5zKmi9NyQ62vCAaGW8ytmamq",
+        SOLANA_ESCROW_ADDRESS: "BdsusD4mCRpwG66mP8zcmSXAG4yvpJKWLutcoGZSVVJD",
+      };
 
-  // Create Anchor instruction using BorshInstructionCoder (handles discriminator automatically)
-  const createMintTokenInstruction = async (userPublicKey: PublicKey, userTokenAccount: PublicKey) => {
-    // Derive OFT store PDA using the escrow address
-    // Based on LayerZero's pattern: oft_store is derived from escrow
-    const [oftStore] = PublicKey.findProgramAddressSync(
-      [Buffer.from("oft_store"), escrow.toBuffer()],
-      programId
-    );
-    
-    // Derive daily mint limit PDA
-    const [dailyMintLimit] = PublicKey.findProgramAddressSync(
-      [Buffer.from("daily_mint_limit"), oftStore.toBuffer(), userPublicKey.toBuffer()],
-      programId
-    );
+      const mintAddress =
+        CONTRACTS.SOLANA_OFT_MINT_ADDRESS ||
+        FALLBACK_ADDRESSES.SOLANA_OFT_MINT_ADDRESS;
+      const programAddress =
+        CONTRACTS.SOLANA_PROGRAM_ADDRESS ||
+        FALLBACK_ADDRESSES.SOLANA_PROGRAM_ADDRESS;
+      const escrowAddress =
+        CONTRACTS.SOLANA_ESCROW_ADDRESS ||
+        FALLBACK_ADDRESSES.SOLANA_ESCROW_ADDRESS;
 
-    // Use Anchor's BorshInstructionCoder to properly encode the instruction
-    // This automatically handles the discriminator generation!
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const coder = new BorshInstructionCoder(oftIdl as any);
-    const instructionData = coder.encode("mintToken", {}); // Empty args for mintToken
+      return {
+        tokenMint: new PublicKey(mintAddress),
+        programId: new PublicKey(programAddress),
+        escrow: new PublicKey(escrowAddress),
+      };
+    } catch (e) {
+      console.error("Error parsing addresses", e);
+      return { tokenMint: null, programId: null, escrow: null } as const;
+    }
+  }, []);
 
-    // Build the accounts array in the order specified by the IDL
-    const keys = [
-      { pubkey: userPublicKey, isSigner: true, isWritable: true },        // user
-      { pubkey: oftStore, isSigner: false, isWritable: false },          // oftStore
-      { pubkey: tokenMint, isSigner: false, isWritable: true },          // tokenMint
-      { pubkey: dailyMintLimit, isSigner: false, isWritable: true },     // dailyMintLimit
-      { pubkey: userTokenAccount, isSigner: false, isWritable: true },   // userTokenAccount
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },  // tokenProgram
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }, // systemProgram
-    ];
+  // ------------------------------------------------------------
+  // Anchor helpers
+  // ------------------------------------------------------------
+  const getProvider = useCallback(() => {
+    if (!wallet) return null;
+    return new AnchorProvider(connection, wallet as any, {
+      commitment: "confirmed",
+    });
+  }, [connection, wallet]);
 
-    return {
-      keys,
-      programId,
-      data: instructionData,
-    };
-  };
+  const getProgram = useCallback(() => {
+    const provider = getProvider();
+    if (!provider || !programId) return null;
+    return new Program(oftIdl as Idl, programId, provider);
+  }, [getProvider, programId]);
 
-  // Fetch token balance
-  const fetchBalance = async () => {
-    if (!wallet.publicKey) return;
-    
+  // ------------------------------------------------------------
+  // Balance
+  // ------------------------------------------------------------
+  const fetchBalance = useCallback(async () => {
+    if (!wallet?.publicKey || !tokenMint) return;
+
     setIsLoadingBalance(true);
     setError(null);
-    
-    try {
-      const associatedTokenAddress = await getAssociatedTokenAddress(
-        tokenMint,
-        wallet.publicKey
-      );
 
-      const account = await getAccount(connection, associatedTokenAddress);
-      
-      // Get mint info to determine decimals
+    try {
+      const ata = await getAssociatedTokenAddress(tokenMint, wallet.publicKey);
+      const account = await getAccount(connection, ata);
+
       const mintInfo = await connection.getParsedAccountInfo(tokenMint);
-      const decimals = mintInfo.value?.data && 'parsed' in mintInfo.value.data 
-        ? mintInfo.value.data.parsed.info.decimals || 6
-        : 6;
+      const decimals =
+        mintInfo.value?.data && "parsed" in mintInfo.value.data
+          ? (mintInfo.value.data.parsed.info.decimals as number) ?? 6
+          : 6;
 
       setBalance({
         amount: Number(account.amount),
         decimals,
-        uiAmount: Number(account.amount) / Math.pow(10, decimals)
+        uiAmount: Number(account.amount) / 10 ** decimals,
       });
-    } catch (error) {
-      if (error instanceof TokenAccountNotFoundError) {
-        setBalance({
-          amount: 0,
-          decimals: 6,
-          uiAmount: 0
-        });
+    } catch (err) {
+      if (err instanceof TokenAccountNotFoundError) {
+        setBalance({ amount: 0, decimals: 6, uiAmount: 0 });
       } else {
-        console.error('Error fetching balance:', error);
-        setError('Failed to fetch token balance');
+        console.error(err);
+        setError("Failed to fetch token balance");
       }
     } finally {
       setIsLoadingBalance(false);
     }
-  };
+  }, [connection, tokenMint, wallet?.publicKey]);
 
-  // Create associated token account if needed
-  const createAssociatedTokenAccount = async (userPublicKey: PublicKey) => {
-    const associatedTokenAddress = await getAssociatedTokenAddress(
-      tokenMint,
-      userPublicKey
-    );
+  // ------------------------------------------------------------
+  // Associated Token Account
+  // ------------------------------------------------------------
+  const createAssociatedTokenAccount = useCallback(
+    async (user: PublicKey): Promise<PublicKey> => {
+      if (!tokenMint) throw new Error("Token mint not initialised");
 
-    try {
-      // Try to get the account first
-      await getAccount(connection, associatedTokenAddress);
-      return associatedTokenAddress; // Account exists
-    } catch (error) {
-      if (error instanceof TokenAccountNotFoundError) {
-        // Create the account
-        const transaction = new Transaction().add(
-          createAssociatedTokenAccountInstruction(
-            userPublicKey, // payer
-            associatedTokenAddress, // associated token account
-            userPublicKey, // owner
-            tokenMint // mint
-          )
-        );
+      const ata = await getAssociatedTokenAddress(tokenMint, user);
 
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-        transaction.feePayer = userPublicKey;
+      try {
+        await getAccount(connection, ata);
+        return ata;
+      } catch (err) {
+        if (err instanceof TokenAccountNotFoundError) {
+          const ix = createAssociatedTokenAccountInstruction(
+            user,
+            ata,
+            user,
+            tokenMint
+          );
 
-        const signedTransaction = await wallet.signTransaction!(transaction);
-        const signature = await connection.sendRawTransaction(
-          signedTransaction.serialize()
-        );
+          const provider = getProvider();
+          if (!provider) throw new Error("Provider not initialised");
 
-        await connection.confirmTransaction(signature, 'confirmed');
-        return associatedTokenAddress;
+          const tx = new Transaction().add(ix);
+          const sig = await provider.sendAndConfirm(tx, []);
+
+          console.log("Created ATA", sig);
+          return ata;
+        }
+        throw err;
       }
-      throw error;
-    }
-  };
+    },
+    [connection, getProvider, tokenMint]
+  );
 
-  // Mint tokens using Anchor BorshInstructionCoder (proper discriminator handling)
-  const handleMint = async () => {
-    if (!wallet.connected || !wallet.publicKey) {
-      setError("Wallet not connected");
+  // ------------------------------------------------------------
+  // Mint
+  // ------------------------------------------------------------
+  const handleMint = useCallback(async () => {
+    if (!wallet?.publicKey || !tokenMint || !programId || !escrow) {
+      setError("Wallet not connected or contracts not initialised");
       return;
     }
 
@@ -159,75 +167,95 @@ export default function SolanaOftCard() {
     setError(null);
 
     try {
-      // 1. Ensure user has associated token account
-      const userTokenAccount = await createAssociatedTokenAccount(wallet.publicKey);
-      
-      // 2. Create instruction using Anchor's BorshInstructionCoder + LayerZero SDK
-      // This automatically generates the correct discriminator!
-      const instructionData = await createMintTokenInstruction(wallet.publicKey, userTokenAccount);
-      
-      // 3. Build and send the transaction
-      const transaction = new Transaction().add(instructionData);
-      
-      const { blockhash } = await connection.getLatestBlockhash();
-      transaction.recentBlockhash = blockhash;
-      transaction.feePayer = wallet.publicKey;
+      const provider = getProvider();
+      const program = getProgram();
+      if (!provider || !program) throw new Error("Provider / Program missing");
 
-      const signedTransaction = await wallet.signTransaction!(transaction);
-      const signature = await connection.sendRawTransaction(
-        signedTransaction.serialize()
+      const userTokenAccount = await createAssociatedTokenAccount(
+        wallet.publicKey
       );
 
-      await connection.confirmTransaction(signature, 'confirmed');
-      
-      console.log("OFT mint transaction completed:", signature);
-      
-      // Refresh balance after minting
+      const [oftStore] = PublicKey.findProgramAddressSync(
+        [Buffer.from("oft_store"), escrow.toBuffer()],
+        programId
+      );
+
+      const [dailyMintLimit] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("daily_mint_limit"),
+          oftStore.toBuffer(),
+          wallet.publicKey.toBuffer(),
+        ],
+        programId
+      );
+
+      const signature = await program.methods
+        .mintToken()
+        .accounts({
+          user: wallet.publicKey,
+          oftStore,
+          tokenMint,
+          dailyMintLimit,
+          userTokenAccount,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+
+      console.log("OFT mint tx:", signature);
+      await connection.confirmTransaction(signature, "confirmed");
       await fetchBalance();
-      
-    } catch (error) {
-      console.error("Error minting OFT tokens:", error);
-      
-      // Handle specific OFT program errors
-      if (error && typeof error === 'object' && 'logs' in error) {
-        const logs = (error as { logs?: string[] }).logs || [];
-        const errorLog = logs.find((log: string) => log.includes('Error'));
-        if (errorLog) {
-          if (errorLog.includes('6009')) {
-            setError('Daily mint limit reached. Please try again tomorrow.');
-          } else if (errorLog.includes('6008')) {
-            setError('Minting is currently paused.');
-          } else if (errorLog.includes('6000')) {
-            setError('Unauthorized to mint tokens.');
-          } else {
-            setError(`Program error: ${errorLog}`);
-          }
-        } else {
-          setError('Transaction failed. Please check the console for details.');
-        }
-      } else {
-        setError(error instanceof Error ? error.message : "Failed to mint OFT tokens");
-      }
+    } catch (err: any) {
+      console.error("Error minting", err);
+      const msg =
+        err?.error?.errorMessage ?? err?.message ?? "Failed to mint OFT tokens";
+      setError(msg);
     } finally {
       setIsMinting(false);
     }
-  };
+  }, [
+    wallet?.publicKey,
+    tokenMint,
+    programId,
+    escrow,
+    getProvider,
+    getProgram,
+    createAssociatedTokenAccount,
+    connection,
+    fetchBalance,
+  ]);
 
-  // Fetch balance when wallet connects
+  // ------------------------------------------------------------
+  // Effects
+  // ------------------------------------------------------------
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey) {
-      fetchBalance();
-    }
-  }, [wallet.connected, wallet.publicKey]);
+    if (wallet?.publicKey) fetchBalance();
+  }, [wallet?.publicKey, fetchBalance]);
 
-  if (!wallet.connected) {
+  // ------------------------------------------------------------
+  // UI
+  // ------------------------------------------------------------
+  if (!tokenMint || !programId || !escrow) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Solana OFT
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          Connect your Solana wallet to view OFT balance and mint tokens.
+          Loading contract configuration...
+        </p>
+      </div>
+    );
+  }
+
+  if (!wallet) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Solana OFT
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Connect your wallet to view and mint OFT tokens.
         </p>
       </div>
     );
@@ -238,31 +266,35 @@ export default function SolanaOftCard() {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Solana OFT
       </h3>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
         </div>
       )}
-      
+
       <div className="space-y-4">
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Balance</h4>
+          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+            Balance
+          </h4>
           <div className="flex items-center justify-between">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {isLoadingBalance ? 'Loading...' : `${balance.uiAmount.toLocaleString()} OFT`}
+              {isLoadingBalance
+                ? "Loading..."
+                : `${balance.uiAmount.toLocaleString()} OFT`}
             </p>
             <button
               onClick={fetchBalance}
               disabled={isLoadingBalance}
               className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded transition-colors duration-200"
             >
-              {isLoadingBalance ? 'Loading...' : 'Refresh'}
+              {isLoadingBalance ? "Loading..." : "Refresh"}
             </button>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            <span className="font-medium">Mint:</span> 
-            <span className="font-mono text-xs ml-1">{CONTRACTS.SOLANA_OFT_MINT_ADDRESS}</span>
+            <span className="font-medium">Mint:</span>
+            <span className="font-mono text-xs ml-1">{tokenMint.toString()}</span>
           </p>
         </div>
 
@@ -272,14 +304,14 @@ export default function SolanaOftCard() {
             disabled={isMinting}
             className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium rounded-lg transition-colors duration-200"
           >
-            {isMinting ? 'Minting OFT Tokens...' : 'Mint OFT Tokens'}
+            {isMinting ? "Minting OFT Tokens..." : "Mint OFT Tokens"}
           </button>
-          
+
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Using LayerZero OFT Program: {CONTRACTS.SOLANA_PROGRAM_ADDRESS}
+            Using LayerZero OFT Program: {programId.toString()}
           </p>
         </div>
       </div>
     </div>
   );
-} 
+}
