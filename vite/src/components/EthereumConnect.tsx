@@ -1,9 +1,14 @@
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useChainId } from 'wagmi'
+import { optimismSepolia } from 'wagmi/chains'
 
 export function EthereumConnect() {
   const { address, isConnected } = useAccount()
+  const chainId = useChainId()
   const { connectors, connect, status, error } = useConnect()
   const { disconnect } = useDisconnect()
+
+  const isCorrectNetwork = chainId === optimismSepolia.id
+  const networkName = isCorrectNetwork ? 'OP Sepolia' : 'Wrong Network'
 
   if (isConnected) {
     return (
@@ -11,9 +16,15 @@ export function EthereumConnect() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Ethereum Wallet Connected
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            Address: {address?.slice(0, 6)}...{address?.slice(-4)}
+            <span className="font-medium">Address:</span> {address?.slice(0, 6)}...{address?.slice(-4)}
+          </div>
+          <div className="text-sm">
+            <span className="font-medium text-gray-600 dark:text-gray-400">Network:</span>{' '}
+            <span className={`font-medium ${isCorrectNetwork ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {networkName}
+            </span>
           </div>
           <button
             onClick={() => disconnect()}
