@@ -10,8 +10,6 @@ import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-ad
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { CONTRACTS } from "../config/contracts";
 
-const amount = 0.1 * LAMPORTS_PER_SOL;
-
 const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
 export default function OftQuote() {
@@ -19,6 +17,7 @@ export default function OftQuote() {
   const { connection } = useConnection();
 
   const [isClient, setIsClient] = useState(false);
+  const [amount, setAmount] = useState('0.1');
   const [nativeFee, setNativeFee] = useState<bigint | null>(null);
 
   useEffect(() => {
@@ -46,6 +45,8 @@ export default function OftQuote() {
     console.log("escrowPk", escrowPk.toBase58());
     const recipientAddressBytes32 = addressToBytes32(CONTRACTS.SEPOLIA_WALLET);
 
+    const amountLamports = BigInt(Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL));
+
     const { nativeFee } = await oft.quote(
       umi.rpc,
       {
@@ -57,7 +58,7 @@ export default function OftQuote() {
         payInLzToken: false,
         to: Buffer.from(recipientAddressBytes32),
         dstEid: toEid,
-        amountLd: BigInt(amount),
+        amountLd: amountLamports,
         minAmountLd: 1n,
         options: Buffer.from(""), // enforcedOptions must have been set
         composeMsg: undefined,
@@ -77,42 +78,32 @@ export default function OftQuote() {
 
       <div className="space-y-4 mb-6">
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Contract Addresses</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">OP Sepolia OFT:</span> <span className="font-mono text-xs">{CONTRACTS.SEPOLIA_OFT_ADDRESS}</span>
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana OFT Mint:</span> <span className="font-mono text-xs">{CONTRACTS.SOLANA_OFT_MINT_ADDRESS}</span>
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Solana OFT Store:</span> <span className="font-mono text-xs">{CONTRACTS.SOLANA_OFT_STORE_ADDRESS}</span>
-          </p>
-        </div>
-
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Transfer Details</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             <span className="font-medium">Destination (OP Sepolia):</span> <span className="font-mono text-xs">{CONTRACTS.SEPOLIA_WALLET}</span>
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Connected Solana:</span> <span className="font-mono text-xs">{wallet.publicKey?.toBase58()}</span>
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">RPC Endpoint:</span> <span className="font-mono text-xs">{connection.rpcEndpoint}</span>
-          </p>
         </div>
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Amount (Hardcoded):</span> {amount}
-          </p>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Amount to Send
+          </label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            step="0.01"
+            min="0"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            placeholder="Enter amount"
+          />
         </div>
       </div>
 
       <button 
         onClick={onClickQuote}
         className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={!wallet.connected || !wallet.publicKey}
+        disabled={!wallet.connected || !wallet.publicKey || !amount}
       >
         Get OFT Quote
       </button>
