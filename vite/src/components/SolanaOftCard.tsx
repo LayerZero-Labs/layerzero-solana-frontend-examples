@@ -12,7 +12,7 @@ import {
   TokenAccountNotFoundError,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { AnchorProvider, Program, Idl } from "@coral-xyz/anchor";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { CONTRACTS } from "../config/contracts";
 import oftIdl from "../solana/idl/oft.json";
 
@@ -20,6 +20,13 @@ interface TokenBalance {
   amount: number;
   decimals: number;
   uiAmount: number;
+}
+
+interface AnchorError {
+  error?: {
+    errorMessage?: string;
+  };
+  message?: string;
 }
 
 export default function SolanaOftCard() {
@@ -55,7 +62,7 @@ export default function SolanaOftCard() {
   // ------------------------------------------------------------
   const getProvider = useCallback(() => {
     if (!wallet) return null;
-    return new AnchorProvider(connection, wallet as any, {
+    return new AnchorProvider(connection, wallet, {
       commitment: "confirmed",
     });
   }, [connection, wallet]);
@@ -63,7 +70,8 @@ export default function SolanaOftCard() {
   const getProgram = useCallback(() => {
     const provider = getProvider();
     if (!provider || !programId) return null;
-    return new Program(oftIdl as Idl, programId, provider);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return new Program(oftIdl as any, programId, provider);
   }, [getProvider, programId]);
 
   // ------------------------------------------------------------
@@ -161,8 +169,7 @@ export default function SolanaOftCard() {
 
       const [dailyMintLimit] = PublicKey.findProgramAddressSync(
         [
-          Buffer.from("daily_mint_limit"),
-          oftStore.toBuffer(),
+          Buffer.from("DailyMintLimit"),
           wallet.publicKey.toBuffer(),
         ],
         programId
@@ -184,10 +191,11 @@ export default function SolanaOftCard() {
       console.log("OFT mint tx:", signature);
       await connection.confirmTransaction(signature, "confirmed");
       await fetchBalance();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error minting", err);
+      const anchorError = err as AnchorError;
       const msg =
-        err?.error?.errorMessage ?? err?.message ?? "Failed to mint OFT tokens";
+        anchorError?.error?.errorMessage ?? anchorError?.message ?? "Failed to mint OFT tokens";
       setError(msg);
     } finally {
       setIsMinting(false);
