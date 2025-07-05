@@ -1,5 +1,6 @@
 "use client";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { useChainId } from "wagmi";
 import { oft } from "@layerzerolabs/oft-v2-solana-sdk";
 import { useState, useEffect } from "react";
 import { EndpointId } from "@layerzerolabs/lz-definitions";
@@ -10,15 +11,28 @@ import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-ad
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { CONTRACTS } from "../config/contracts";
 
-const toEid = EndpointId.SEPOLIA_V2_TESTNET;
+// Mapper function to convert chainId to EndpointId
+const getEndpointIdFromChainId = (chainId: number): number => {
+  const chainIdToEndpointId: Record<number, number> = {
+    11155420: EndpointId.OPTSEP_V2_TESTNET, // OP Sepolia
+    11155111: EndpointId.SEPOLIA_V2_TESTNET, // Sepolia
+    // Add more mappings as needed
+  };
+  
+  return chainIdToEndpointId[chainId] || EndpointId.OPTSEP_V2_TESTNET; // Default to OP Sepolia
+};
 
 export default function OftQuote() {
   const wallet = useWallet();
   const { connection } = useConnection();
+  const chainId = useChainId();
 
   const [isClient, setIsClient] = useState(false);
   const [amount, setAmount] = useState('0.1');
   const [nativeFee, setNativeFee] = useState<bigint | null>(null);
+
+  // Get the appropriate EndpointId based on the connected ethereum wallet's chainId
+  const toEid = getEndpointIdFromChainId(chainId);
 
   useEffect(() => {
     setIsClient(true); // Set to true when component mounts (client-side)
@@ -47,6 +61,8 @@ export default function OftQuote() {
 
     const amountLamports = BigInt(Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL));
 
+    console.log("Using EndpointId:", toEid, "for chainId:", chainId);
+
     const { nativeFee } = await oft.quote(
       umi.rpc,
       {
@@ -70,6 +86,15 @@ export default function OftQuote() {
     setNativeFee(nativeFee);
   }
 
+  // Get the network name based on chainId
+  const getNetworkName = (chainId: number): string => {
+    const networkNames: Record<number, string> = {
+      11155420: "OP Sepolia",
+      11155111: "Sepolia",
+    };
+    return networkNames[chainId] || "Unknown Network";
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
@@ -80,7 +105,10 @@ export default function OftQuote() {
         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Transfer Details</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium">Destination (OP Sepolia):</span> <span className="font-mono text-xs">{CONTRACTS.SEPOLIA_WALLET}</span>
+            <span className="font-medium">Destination ({getNetworkName(chainId)}):</span> <span className="font-mono text-xs">{CONTRACTS.SEPOLIA_WALLET}</span>
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            <span className="font-medium">Chain ID:</span> {chainId} | <span className="font-medium">Endpoint ID:</span> {toEid}
           </p>
         </div>
 
