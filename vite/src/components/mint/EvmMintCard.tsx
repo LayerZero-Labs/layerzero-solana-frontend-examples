@@ -34,7 +34,7 @@ export default function EvmMintCard() {
         address: SEPOLIA_OFT_ADDRESS,
         abi: myOftMockAbi,
         functionName: 'mint',
-        args: [address, parseEther('100')], // Mint 100 OFT tokens
+        args: [address, parseEther('1')], // Mint 1 OFT tokens
       })
     } catch (error) {
       console.error('Error minting:', error)
@@ -53,12 +53,7 @@ export default function EvmMintCard() {
   }
 
   return (
-    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-      <h3 className="text-lg font-medium text-layerzero-white mb-4">
-        EVM OFT Mint
-      </h3>
-      
-      <div className="space-y-4">
+    <div className="space-y-4">
         {/* Wallet-specific functionality */}
         {!isConnected ? (
           <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
@@ -120,6 +115,5 @@ export default function EvmMintCard() {
           </>
         )}
       </div>
-    </div>
   )
 } 

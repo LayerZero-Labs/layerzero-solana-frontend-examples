@@ -19,30 +19,19 @@ export default function SolanaMintCard() {
   // ------------------------------------------------------------
   if (!tokenMint || !programId || !oftStore) {
     return (
-      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-        <h3 className="text-lg font-medium text-layerzero-white mb-4">
-          Solana OFT Mint
-        </h3>
-        <p className="text-sm text-layerzero-gray-400">
-          Loading contract configuration...
-        </p>
-      </div>
+      <p className="text-sm text-layerzero-gray-400">
+        Loading contract configuration...
+      </p>
     );
   }
 
   return (
-    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-      <h3 className="text-lg font-medium text-layerzero-white mb-4">
-        Solana OFT Mint
-      </h3>
-
+    <div className="space-y-4">
       {error && (
         <div className="mb-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error}
         </div>
       )}
-
-      <div className="space-y-4">
         {/* Wallet-specific functionality */}
         {!wallet.connected ? (
           <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
@@ -90,6 +79,5 @@ export default function SolanaMintCard() {
           </>
         )}
       </div>
-    </div>
   );
 } 

@@ -23,7 +23,7 @@ export const SolanaConnect: FC = () => {
 
   return (
     <WalletModalProvider>
-      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+      <div>
         <style>
           {`
             .wallet-buttons-container {
@@ -60,9 +60,6 @@ export const SolanaConnect: FC = () => {
             }
           `}
         </style>
-        <h2 className="text-xl font-medium text-layerzero-white mb-4">
-          {connected ? "Solana Wallet Connected" : "Solana Wallet"}
-        </h2>
         
         {connected ? (
           <div className="space-y-3">

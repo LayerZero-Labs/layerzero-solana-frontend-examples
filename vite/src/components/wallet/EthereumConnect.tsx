@@ -12,11 +12,7 @@ export function EthereumConnect() {
 
   if (isConnected) {
     return (
-      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-        <h2 className="text-xl font-medium text-layerzero-white mb-4">
-          Ethereum Wallet Connected
-        </h2>
-        <div className="space-y-3">
+      <div className="space-y-3">
           <div className="text-sm text-layerzero-gray-400">
             <span className="font-medium">Address:</span> {address?.slice(0, 6)}...{address?.slice(-4)}
           </div>
@@ -33,29 +29,23 @@ export function EthereumConnect() {
             Disconnect
           </button>
         </div>
-      </div>
     )
   }
 
   return (
-    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-      <h2 className="text-xl font-medium text-layerzero-white mb-4">
-        Connect Ethereum Wallet
-      </h2>
-      <div className="space-y-3">
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            type="button"
-            disabled={status === 'pending'}
-            className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {connector.name}
-            {status === 'pending' && ' (connecting...)'}
-          </button>
-        ))}
-      </div>
+    <div className="space-y-3">
+      {connectors.map((connector) => (
+        <button
+          key={connector.uid}
+          onClick={() => connect({ connector })}
+          type="button"
+          disabled={status === 'pending'}
+          className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {connector.name}
+          {status === 'pending' && ' (connecting...)'}
+        </button>
+      ))}
       {error && (
         <div className="mt-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error.message}

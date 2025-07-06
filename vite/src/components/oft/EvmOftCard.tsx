@@ -5,12 +5,7 @@ export default function EvmOftCard() {
   const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
   return (
-    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-      <h3 className="text-lg font-medium text-layerzero-white mb-4">
-        EVM OFT
-      </h3>
-      
-      <div className="space-y-4">
+    <div className="space-y-4">
         {/* Token Information - Always visible */}
         <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
           <h4 className="font-medium text-layerzero-white mb-3">
@@ -44,6 +39,5 @@ export default function EvmOftCard() {
           </div>
         </div>
       </div>
-    </div>
   )
 } 
