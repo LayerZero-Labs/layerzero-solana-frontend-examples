@@ -205,12 +205,30 @@ export default function EvmOftSend() {
         {isConfirmed && (
           <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
             <p className="text-sm text-green-400">
-              <span className="font-medium">Transaction confirmed!</span>
+              <span className="font-medium">Transaction Hash:</span>
+              {hash && (
+                <span className="font-mono text-xs ml-2">{hash}</span>
+              )}
             </p>
             {hash && (
-              <p className="text-xs text-green-400 mt-1 font-mono">
-                {hash}
-              </p>
+              <div className="flex gap-4 mt-2">
+                <a 
+                  href={`https://optimism-sepolia.blockscout.com/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-green-400 underline hover:no-underline"
+                >
+                  View on OP Sepolia Explorer
+                </a>
+                <a 
+                  href={`https://testnet.layerzeroscan.com/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-green-400 underline hover:no-underline"
+                >
+                  View on LayerZero Scan
+                </a>
+              </div>
             )}
           </div>
         )}
