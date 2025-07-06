@@ -1,4 +1,4 @@
-import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   PublicKey,
@@ -32,7 +32,7 @@ interface AnchorError {
 
 // Custom hook for Solana OFT logic
 export function useSolanaOft() {
-  const wallet = useAnchorWallet();
+  const wallet = useWallet();
   const { connection } = useConnection();
   const [isMinting, setIsMinting] = useState(false);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
@@ -63,8 +63,23 @@ export function useSolanaOft() {
   // Anchor helpers
   // ------------------------------------------------------------
   const getProvider = useCallback(() => {
-    if (!wallet) return null;
-    return new AnchorProvider(connection, wallet, {
+    if (!wallet.connected || !wallet.publicKey || !wallet.signTransaction) return null;
+    
+    // Create anchor-compatible wallet from the main wallet
+    const anchorWallet = {
+      publicKey: wallet.publicKey,
+      signTransaction: wallet.signTransaction,
+      signAllTransactions: wallet.signAllTransactions || (async (txs) => {
+        // Fallback: sign transactions one by one if signAllTransactions is not available
+        const signedTxs = [];
+        for (const tx of txs) {
+          signedTxs.push(await wallet.signTransaction!(tx));
+        }
+        return signedTxs;
+      }),
+    };
+    
+    return new AnchorProvider(connection, anchorWallet, {
       commitment: "confirmed",
     });
   }, [connection, wallet]);
@@ -80,7 +95,7 @@ export function useSolanaOft() {
   // Balance
   // ------------------------------------------------------------
   const fetchBalance = useCallback(async () => {
-    if (!wallet?.publicKey || !tokenMint) return;
+    if (!wallet.connected || !wallet.publicKey || !tokenMint) return;
 
     setIsLoadingBalance(true);
     setError(null);
@@ -110,7 +125,7 @@ export function useSolanaOft() {
     } finally {
       setIsLoadingBalance(false);
     }
-  }, [connection, tokenMint, wallet?.publicKey]);
+  }, [connection, tokenMint, wallet.connected, wallet.publicKey]);
 
   // ------------------------------------------------------------
   // Associated Token Account
@@ -152,7 +167,7 @@ export function useSolanaOft() {
   // Mint
   // ------------------------------------------------------------
   const handleMint = useCallback(async () => {
-    if (!wallet?.publicKey || !tokenMint || !programId || !oftStore) {
+    if (!wallet.connected || !wallet.publicKey || !tokenMint || !programId || !oftStore) {
       setError("Wallet not connected or contracts not initialised");
       return;
     }
@@ -218,7 +233,8 @@ export function useSolanaOft() {
       setIsMinting(false);
     }
   }, [
-    wallet?.publicKey,
+    wallet.connected,
+    wallet.publicKey,
     tokenMint,
     programId,
     oftStore,
@@ -233,8 +249,14 @@ export function useSolanaOft() {
   // Effects
   // ------------------------------------------------------------
   useEffect(() => {
-    if (wallet?.publicKey) fetchBalance();
-  }, [wallet?.publicKey, fetchBalance]);
+    if (wallet.connected && wallet.publicKey) {
+      fetchBalance();
+    } else {
+      // Reset state when wallet disconnects
+      setBalance({ amount: 0, decimals: 6, uiAmount: 0 });
+      setError(null);
+    }
+  }, [wallet.connected, wallet.publicKey, fetchBalance]);
 
   return {
     wallet,
