@@ -4,8 +4,8 @@ import { parseEther, formatEther } from 'viem'
 import { optimismSepolia } from 'wagmi/chains'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
-import { myOftMockAbi } from '../evm/MyOFTMock'
-import { CONTRACTS } from '../config/contracts'
+import { myOftMockAbi } from '../../evm/MyOFTMock'
+import { CONTRACTS } from '../../config/contracts'
 
 const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 

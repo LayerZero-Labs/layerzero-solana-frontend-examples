@@ -1,8 +1,8 @@
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
 import { formatEther, parseEther } from 'viem'
 import { optimismSepolia } from 'wagmi/chains'
-import { CONTRACTS } from '../config/contracts'
-import { myOftMockAbi } from '../evm/MyOFTMock'
+import { CONTRACTS } from '../../config/contracts'
+import { myOftMockAbi } from '../../evm/MyOFTMock'
 
 export default function EvmOftCard() {
   const { address, isConnected } = useAccount()

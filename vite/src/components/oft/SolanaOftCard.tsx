@@ -1,4 +1,4 @@
-import { useSolanaOft } from "../hooks/useSolanaOft";
+import { useSolanaOft } from "../../hooks/useSolanaOft";
 
 export default function SolanaOftCard() {
   const {

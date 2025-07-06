@@ -19,7 +19,7 @@ import {
 import { fromWeb3JsPublicKey } from '@metaplex-foundation/umi-web3js-adapters';
 import bs58 from 'bs58';
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { CONTRACTS } from "../config/contracts";
+import { CONTRACTS } from "../../config/contracts";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 // Mapper function to convert chainId to EndpointId

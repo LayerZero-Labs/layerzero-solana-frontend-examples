@@ -1,11 +1,11 @@
-import SolanaToEvmCard from "./components/SolanaToEvmCard";
-import EvmOftSend from "./components/EvmOftSend";
-import SolanaOftCard from "./components/SolanaOftCard";
-import EvmOftCard from "./components/EvmOftCard";
-import { SolanaWalletProvider } from "./components/SolanaWalletProvider";
-import { SolanaConnect } from "./components/SolanaConnect";
-import { EthereumConnect } from "./components/EthereumConnect";
-import { WagmiProviderWrapper } from "./components/WagmiProvider";
+import { SolanaToEvmCard, EvmOftSend } from "./components/send";
+import { SolanaOftCard, EvmOftCard } from "./components/oft";
+import { 
+  SolanaWalletProvider, 
+  SolanaConnect, 
+  EthereumConnect, 
+  WagmiProviderWrapper 
+} from "./components/wallet";
 
 function App() {
   return (
