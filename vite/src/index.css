@@ -2,11 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* LayerZero Brand Styles */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* LayerZero Color Variables */
+  --lz-black: #000000;
+  --lz-dark: #0A0A0A;
+  --lz-gray-900: #1A1A1A;
+  --lz-gray-800: #2A2A2A;
+  --lz-gray-700: #3A3A3A;
+  --lz-white: #FFFFFF;
+  --lz-blue: #0052FF;
+}
+
+/* Custom Components */
+@layer components {
+  .lz-card {
+    @apply bg-layerzero-gray-900 border border-layerzero-gray-700 rounded-lg p-6 shadow-lg;
+  }
+  
+  .lz-button {
+    @apply bg-layerzero-blue-500 hover:bg-layerzero-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .lz-button-secondary {
+    @apply bg-layerzero-gray-800 hover:bg-layerzero-gray-700 text-layerzero-white border border-layerzero-gray-600 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .lz-input {
+    @apply bg-layerzero-gray-800 border border-layerzero-gray-600 text-layerzero-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-layerzero-blue-500 focus:border-transparent;
+  }
+  
+  .lz-section {
+    @apply mb-12;
+  }
+  
+  .lz-section-title {
+    @apply text-2xl font-bold text-layerzero-white mb-6 flex items-center gap-3;
+  }
+  
+  .lz-section-number {
+    @apply bg-layerzero-gray-800 text-layerzero-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-mono;
+  }
+}
+
+/* Global Styles */
+body {
+  @apply bg-layerzero-black text-layerzero-white;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--lz-gray-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--lz-gray-700);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lz-gray-600);
 }
