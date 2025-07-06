@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { parseEther, formatEther } from 'viem'
 import { optimismSepolia } from 'wagmi/chains'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
@@ -17,6 +18,7 @@ export default function EvmToSolanaCard() {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   })
+  const wallet = useWallet()
 
   const isCorrectNetwork = chainId === optimismSepolia.id
 
@@ -24,6 +26,13 @@ export default function EvmToSolanaCard() {
   const [recipientAddress, setRecipientAddress] = useState('')
   const [quoteFee, setQuoteFee] = useState<bigint | null>(null)
   const [isQuoting, setIsQuoting] = useState(false)
+
+  // Auto-populate recipient address when Solana wallet connects
+  useEffect(() => {
+    if (wallet.connected && wallet.publicKey && !recipientAddress) {
+      setRecipientAddress(wallet.publicKey.toString());
+    }
+  }, [wallet.connected, wallet.publicKey, recipientAddress]);
 
 
 

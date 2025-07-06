@@ -47,6 +47,7 @@ export default function SolanaToEvmCard() {
 
   const [isClient, setIsClient] = useState(false);
   const [amount, setAmount] = useState('0.1');
+  const [recipientAddress, setRecipientAddress] = useState('');
   const [nativeFee, setNativeFee] = useState<bigint | null>(null);
   const [sendState, setSendState] = useState<SendState>({
     isLoading: false,
@@ -61,6 +62,13 @@ export default function SolanaToEvmCard() {
     setIsClient(true); // Set to true when component mounts (client-side)
   }, []);
 
+  // Auto-populate recipient address when Ethereum wallet connects
+  useEffect(() => {
+    if (isEthereumConnected && ethereumAddress && !recipientAddress) {
+      setRecipientAddress(ethereumAddress);
+    }
+  }, [isEthereumConnected, ethereumAddress, recipientAddress]);
+
   if (!isClient) return null; // Prevent rendering mismatched content
 
   // Use the connection from the wallet provider instead of hardcoded RPC
@@ -73,8 +81,8 @@ export default function SolanaToEvmCard() {
       return;
     }
 
-    if (!isEthereumConnected || !ethereumAddress) {
-      console.error("Ethereum wallet is not connected or address is missing.");
+    if (!recipientAddress) {
+      console.error("Recipient address is required.");
       return;
     }
 
@@ -86,13 +94,13 @@ export default function SolanaToEvmCard() {
     const escrowPk = new PublicKey(oftStoreInfo.tokenEscrow);
     console.log("escrowPk", escrowPk.toBase58());
     
-    // Use the connected ethereum wallet address as the destination
-    const recipientAddressBytes32 = addressToBytes32(ethereumAddress);
+    // Use the recipient address as the destination
+    const recipientAddressBytes32 = addressToBytes32(recipientAddress);
 
     const amountLamports = BigInt(Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL));
 
     console.log("Using EndpointId:", toEid, "for chainId:", chainId);
-    console.log("Destination address:", ethereumAddress);
+    console.log("Destination address:", recipientAddress);
 
     const { nativeFee } = await oft.quote(
       umi.rpc,
@@ -123,8 +131,8 @@ export default function SolanaToEvmCard() {
       return;
     }
 
-    if (!isEthereumConnected || !ethereumAddress) {
-      console.error("Ethereum wallet is not connected or address is missing.");
+    if (!recipientAddress) {
+      console.error("Recipient address is required.");
       return;
     }
 
@@ -169,15 +177,15 @@ export default function SolanaToEvmCard() {
         throw new Error(`Insufficient balance (need ${amountUnits}, have ${balance})`);
       }
 
-      // Use the connected ethereum wallet address as the destination
-      const recipientAddressBytes32 = addressToBytes32(ethereumAddress);
+      // Use the recipient address as the destination
+      const recipientAddressBytes32 = addressToBytes32(recipientAddress);
 
       console.log("Sending cross-chain OFT transaction...");
       console.log("Source EID: SOLANA_V2_TESTNET");
       console.log("Destination EID:", toEid);
       console.log("Amount:", amountUnits.toString());
       console.log("Native fee:", nativeFee.toString());
-      console.log("Destination address:", ethereumAddress);
+      console.log("Destination address:", recipientAddress);
 
       // Re-quote to ensure we have the latest fee (sometimes fees can change)
       console.log("Re-quoting to ensure latest fee...");
@@ -307,30 +315,36 @@ export default function SolanaToEvmCard() {
   return (
     <div>
       <div className="space-y-4 mb-6">
-        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
-          <h3 className="font-medium text-layerzero-white mb-2">Transfer Details</h3>
-          <p className="text-sm text-layerzero-gray-400">
-            <span className="font-medium">Destination ({getNetworkName(chainId)}):</span> <span className="font-mono text-xs">{ethereumAddress || 'No Ethereum wallet connected'}</span>
-          </p>
-          <p className="text-sm text-layerzero-gray-400 mt-1">
-            <span className="font-medium">Destination Endpoint ID:</span> {toEid}
-          </p>
-        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-layerzero-white mb-2">
+              Amount to Send
+            </label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              step="0.01"
+              min="0"
+              className="lz-input w-full"
+              placeholder="Enter amount"
+              disabled={sendState.isLoading}
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-layerzero-white mb-2">
-            Amount to Send
-          </label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            step="0.01"
-            min="0"
-            className="lz-input w-full"
-            placeholder="Enter amount"
-            disabled={sendState.isLoading}
-          />
+          <div>
+            <label className="block text-sm font-medium text-layerzero-white mb-2">
+              Recipient Address ({getNetworkName(chainId)})
+            </label>
+            <input
+              type="text"
+              value={recipientAddress}
+              onChange={(e) => setRecipientAddress(e.target.value)}
+              className="lz-input w-full"
+              placeholder="Enter Ethereum address"
+              disabled={sendState.isLoading}
+            />
+          </div>
         </div>
       </div>
 
@@ -338,26 +352,26 @@ export default function SolanaToEvmCard() {
         <button 
           onClick={onClickQuote}
           className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!wallet.connected || !wallet.publicKey || !amount || !isEthereumConnected || !ethereumAddress || sendState.isLoading}
+          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading}
         >
-          Get OFT Quote
+          Get Quote
         </button>
 
         {nativeFee !== null && (
           <button 
             onClick={onClickSend}
             className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!wallet.connected || !wallet.publicKey || !amount || !isEthereumConnected || !ethereumAddress || sendState.isLoading || nativeFee === null}
+            disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || nativeFee === null}
           >
             {sendState.isLoading ? "Sending..." : "Send OFT"}
           </button>
         )}
       </div>
 
-      {!isEthereumConnected && (
+      {!recipientAddress && (
         <div className="mt-4 p-3 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
           <p className="text-sm text-yellow-400">
-            Please connect your Ethereum wallet to set the destination address.
+            Please enter a recipient address for the destination network.
           </p>
         </div>
       )}
