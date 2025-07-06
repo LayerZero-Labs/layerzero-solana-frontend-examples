@@ -43,7 +43,7 @@ export function EthereumConnect() {
         Connect Ethereum Wallet
       </h2>
       <div className="space-y-3">
-        {connectors.filter(connector => connector.name !== 'Phantom').map((connector) => (
+        {connectors.map((connector) => (
           <button
             key={connector.uid}
             onClick={() => connect({ connector })}
