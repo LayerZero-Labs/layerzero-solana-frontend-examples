@@ -404,7 +404,6 @@ export default function SolanaToEvmCard() {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 }

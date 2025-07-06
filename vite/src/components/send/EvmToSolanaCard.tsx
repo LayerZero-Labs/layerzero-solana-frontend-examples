@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
 import { optimismSepolia } from 'wagmi/chains'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
@@ -25,14 +25,7 @@ export default function EvmToSolanaCard() {
   const [quoteFee, setQuoteFee] = useState<bigint | null>(null)
   const [isQuoting, setIsQuoting] = useState(false)
 
-  // Read user's token balance
-  const { data: balance } = useReadContract({
-    address: SEPOLIA_OFT_ADDRESS,
-    abi: myOftMockAbi,
-    functionName: 'balanceOf',
-    args: [address as `0x${string}`],
-    query: { enabled: !!address }
-  })
+
 
   // Get quote for sending
   const getQuote = async () => {
@@ -119,19 +112,7 @@ export default function EvmToSolanaCard() {
           </div>
         )}
 
-        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
-          <h3 className="font-medium text-layerzero-white mb-2">Your Balance</h3>
-          <p className="text-sm text-layerzero-gray-400">
-            {isCorrectNetwork && balance ? formatEther(balance) : '0'} OFT
-          </p>
-        </div>
 
-        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
-          <h3 className="font-medium text-layerzero-white mb-2">Contract Info</h3>
-          <p className="text-sm text-layerzero-gray-400">
-            <span className="font-medium">OP Sepolia OFT:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
-          </p>
-        </div>
 
         <div className="space-y-3">
           <div>
