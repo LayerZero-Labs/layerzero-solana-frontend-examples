@@ -9,7 +9,7 @@ import { CONTRACTS } from '../../config/contracts'
 
 const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
-export default function EvmOftSend() {
+export default function EvmToSolanaCard() {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()

@@ -1,4 +1,4 @@
-import { SolanaToEvmCard, EvmOftSend } from "./components/send";
+import { SolanaToEvmCard, EvmToSolanaCard } from "./components/send";
 import { SolanaOftCard, EvmOftCard } from "./components/oft";
 import { SolanaMintCard, EvmMintCard } from "./components/mint";
 import { 
@@ -183,7 +183,7 @@ function App() {
                       Transfer tokens from Ethereum to Solana network
                     </p>
                   </div>
-                  <EvmOftSend />
+                  <EvmToSolanaCard />
                 </div>
               </div>
             </div>
