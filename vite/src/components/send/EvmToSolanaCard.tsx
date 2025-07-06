@@ -29,10 +29,10 @@ export default function EvmToSolanaCard() {
 
   // Auto-populate recipient address when Solana wallet connects
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey && !recipientAddress) {
+    if (wallet.connected && wallet.publicKey) {
       setRecipientAddress(wallet.publicKey.toString());
     }
-  }, [wallet.connected, wallet.publicKey, recipientAddress]);
+  }, [wallet.connected, wallet.publicKey]);
 
 
 

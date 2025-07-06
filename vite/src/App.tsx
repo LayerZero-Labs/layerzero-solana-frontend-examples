@@ -183,7 +183,9 @@ function App() {
                       Transfer tokens from Ethereum to Solana network
                     </p>
                   </div>
-                  <EvmToSolanaCard />
+                  <SolanaWalletProvider>
+                    <EvmToSolanaCard />
+                  </SolanaWalletProvider>
                 </div>
               </div>
             </div>
