@@ -47,10 +47,45 @@ function App() {
               </div>
             </div>
 
-            {/* Section 01: Wallet Connections */}
+            {/* Section 01: Token Information */}
             <div className="lz-section">
               <div className="lz-section-title">
                 <div className="lz-section-number">01 /</div>
+                <h3>Token Information</h3>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-8">
+                <div className="lz-card">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-medium text-layerzero-white mb-2">
+                      Solana OFT
+                    </h4>
+                    <p className="text-layerzero-gray-500 text-sm">
+                      View OFT token details on Solana and your balance
+                    </p>
+                  </div>
+                  <SolanaWalletProvider>
+                    <SolanaOftCard />
+                  </SolanaWalletProvider>
+                </div>
+                
+                <div className="lz-card">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-medium text-layerzero-white mb-2">
+                      Ethereum OFT
+                    </h4>
+                    <p className="text-layerzero-gray-500 text-sm">
+                      View OFT token details on Ethereum and your balance
+                    </p>
+                  </div>
+                  <EvmOftCard />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 02: Wallet Connections */}
+            <div className="lz-section">
+              <div className="lz-section-title">
+                <div className="lz-section-number">02 /</div>
                 <h3>Wallet Connections</h3>
               </div>
               <div className="grid lg:grid-cols-2 gap-8">
@@ -78,41 +113,6 @@ function App() {
                     </p>
                   </div>
                   <EthereumConnect />
-                </div>
-              </div>
-            </div>
-
-            {/* Section 02: Token Information */}
-            <div className="lz-section">
-              <div className="lz-section-title">
-                <div className="lz-section-number">02 /</div>
-                <h3>Token Information</h3>
-              </div>
-              <div className="grid lg:grid-cols-2 gap-8">
-                <div className="lz-card">
-                  <div className="mb-6">
-                    <h4 className="text-lg font-medium text-layerzero-white mb-2">
-                      Solana OFT
-                    </h4>
-                    <p className="text-layerzero-gray-500 text-sm">
-                      View your OFT balance and token details on Solana
-                    </p>
-                  </div>
-                  <SolanaWalletProvider>
-                    <SolanaOftCard />
-                  </SolanaWalletProvider>
-                </div>
-                
-                <div className="lz-card">
-                  <div className="mb-6">
-                    <h4 className="text-lg font-medium text-layerzero-white mb-2">
-                      Ethereum OFT
-                    </h4>
-                    <p className="text-layerzero-gray-500 text-sm">
-                      View your OFT balance and token details on Ethereum
-                    </p>
-                  </div>
-                  <EvmOftCard />
                 </div>
               </div>
             </div>
