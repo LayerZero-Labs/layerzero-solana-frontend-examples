@@ -1,19 +1,18 @@
 import { createConfig, http } from 'wagmi'
-import { mainnet, optimismSepolia, arbitrum, base, optimism, polygon } from 'wagmi/chains'
+import { optimismSepolia, arbitrum, base, optimism, polygon } from 'wagmi/chains'
 import { injected, metaMask, walletConnect } from 'wagmi/connectors'
 
 // Get your project ID from https://cloud.walletconnect.com
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID'
 
 export const wagmiConfig = createConfig({
-  chains: [mainnet, optimismSepolia, arbitrum, base, optimism, polygon],
+  chains: [optimismSepolia, arbitrum, base, optimism, polygon],
   connectors: [
     injected(),
     metaMask(),
     walletConnect({ projectId }),
   ],
   transports: {
-    [mainnet.id]: http(),
     [optimismSepolia.id]: http(),
     [arbitrum.id]: http(),
     [base.id]: http(),
