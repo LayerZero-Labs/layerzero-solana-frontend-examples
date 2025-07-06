@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { SolanaConnect } from "../components/SolanaConnect";
-import OftQuote from "@/components/OftQuote";
+import SolanaToEvmCard from "@/components/SolanaToEvmCard";
 
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <div className="py-5 px-20">
       <SolanaConnect />
-      <OftQuote />
+      <SolanaToEvmCard />
     </div>
   );
 }

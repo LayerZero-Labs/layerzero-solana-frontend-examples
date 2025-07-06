@@ -21,7 +21,7 @@ const SOLANA_PROGRAM_ADDRESS = process.env.NEXT_PUBLIC_SOLANA_PROGRAM_ADDRESS;
 const fromEid = EndpointId.SOLANA_V2_TESTNET;
 const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
-export default function OftQuote() {
+export default function SolanaToEvmCard() {
   const wallet = useWallet();
 
   const [isClient, setIsClient] = useState(false);

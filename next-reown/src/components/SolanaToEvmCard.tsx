@@ -23,7 +23,7 @@ const SOLANA_PROGRAM_ADDRESS = process.env.NEXT_PUBLIC_SOLANA_PROGRAM_ADDRESS;
 const fromEid = EndpointId.SOLANA_V2_TESTNET;
 const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
-export const OftQuote = () => {
+export const SolanaToEvmCard = () => {
   const [isClient, setIsClient] = useState(false);
   const [nativeFee, setNativeFee] = useState<bigint | null>(null);
 

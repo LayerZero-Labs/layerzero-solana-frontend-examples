@@ -1,4 +1,4 @@
-import OftQuote from "./components/OftQuote";
+import SolanaToEvmCard from "./components/SolanaToEvmCard";
 import EvmOftSend from "./components/EvmOftSend";
 import SolanaOftCard from "./components/SolanaOftCard";
 import EvmOftCard from "./components/EvmOftCard";
@@ -134,7 +134,7 @@ function App() {
                     </p>
                   </div>
                   <SolanaWalletProvider>
-                    <OftQuote />
+                    <SolanaToEvmCard />
                   </SolanaWalletProvider>
                 </div>
                 

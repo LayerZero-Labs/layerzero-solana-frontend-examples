@@ -1,7 +1,7 @@
 import { ConnectButton } from "@/components/ConnectButton";
 import { InfoList } from "@/components/InfoList";
 import { ActionButtonList } from "@/components/ActionButtonList";
-import { OftQuote } from "@/components/OftQuote";
+import { SolanaToEvmCard } from "@/components/SolanaToEvmCard";
 import Image from 'next/image';
 
 export default function Home() {
@@ -11,7 +11,7 @@ export default function Home() {
       <Image src="/reown.svg" alt="Reown" width={150} height={150} priority />
       <h1>AppKit multichain Next.js App Router Example</h1>
 
-      <OftQuote />
+      <SolanaToEvmCard />
       <ConnectButton />
       <ActionButtonList />
       <div className="advice">

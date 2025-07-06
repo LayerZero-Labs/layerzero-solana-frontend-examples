@@ -39,7 +39,7 @@ interface SendState {
   error: string | null;
 }
 
-export default function OftQuote() {
+export default function SolanaToEvmCard() {
   const wallet = useWallet();
   const { connection } = useConnection();
   const chainId = useChainId();
