@@ -29,7 +29,8 @@ interface AnchorError {
   message?: string;
 }
 
-export default function SolanaOftCard() {
+// Custom hook for Solana OFT logic
+function useSolanaOft() {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [isMinting, setIsMinting] = useState(false);
@@ -218,6 +219,34 @@ export default function SolanaOftCard() {
   useEffect(() => {
     if (wallet?.publicKey) fetchBalance();
   }, [wallet?.publicKey, fetchBalance]);
+
+  return {
+    wallet,
+    balance,
+    isLoadingBalance,
+    isMinting,
+    error,
+    tokenMint,
+    programId,
+    oftStore,
+    fetchBalance,
+    handleMint,
+  };
+}
+
+export default function SolanaOftCard() {
+  const {
+    wallet,
+    balance,
+    isLoadingBalance,
+    isMinting,
+    error,
+    tokenMint,
+    programId,
+    oftStore,
+    fetchBalance,
+    handleMint,
+  } = useSolanaOft();
 
   // ------------------------------------------------------------
   // UI
