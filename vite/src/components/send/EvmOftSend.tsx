@@ -90,24 +90,14 @@ export default function EvmOftSend() {
 
   if (!isConnected) {
     return (
-      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-        <h2 className="text-2xl font-medium text-layerzero-white mb-4">
-          EVM → Solana Transfer
-        </h2>
-        <p className="text-layerzero-gray-400">
-          Please connect your Ethereum wallet to use this feature.
-        </p>
-      </div>
+      <p className="text-layerzero-gray-400">
+        Please connect your Ethereum wallet to use this feature.
+      </p>
     )
   }
 
   return (
-    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-      <h2 className="text-2xl font-medium text-layerzero-white mb-6">
-        EVM → Solana Transfer
-      </h2>
-
-      <div className="space-y-4 mb-6">
+    <div className="space-y-4 mb-6">
         {!isCorrectNetwork && (
           <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
             <div className="flex items-center justify-between">
@@ -233,6 +223,5 @@ export default function EvmOftSend() {
           </div>
         )}
       </div>
-    </div>
   )
 } 

@@ -305,11 +305,7 @@ export default function SolanaToEvmCard() {
   };
 
   return (
-    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
-      <h2 className="text-2xl font-medium text-layerzero-white mb-6">
-        Solana → EVM Transfer
-      </h2>
-
+    <div>
       <div className="space-y-4 mb-6">
         <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
           <h3 className="font-medium text-layerzero-white mb-2">Transfer Details</h3>
@@ -408,6 +404,7 @@ export default function SolanaToEvmCard() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
