@@ -1,5 +1,6 @@
 import { SolanaToEvmCard, EvmOftSend } from "./components/send";
 import { SolanaOftCard, EvmOftCard } from "./components/oft";
+import { SolanaMintCard, EvmMintCard } from "./components/mint";
 import { 
   SolanaWalletProvider, 
   SolanaConnect, 
@@ -19,7 +20,7 @@ function App() {
                 LayerZero Demo Application
               </div>
               <div className="lz-protocol-text">
-                /// One Protocol. Any Blockchain.
+                /// One OFT. 130+ Blockchains.
               </div>
             </div>
           </div>
@@ -39,7 +40,7 @@ function App() {
                   {" "}Token Transfers using LayerZero
                 </h2>
                 <p className="text-layerzero-gray-400 text-lg mb-4 max-w-2xl">
-                  Demo application showcasing seamless token transfers between Ethereum and Solana networks using LayerZero's omnichain infrastructure.
+                  Demo application showcasing seamless token transfers between Ethereum and Solana networks using LayerZero's OFT standard.
                 </p>
                 <div className="lz-protocol-text">
                   /// Demo Only. Not for Production Use.
@@ -116,11 +117,46 @@ function App() {
                 </div>
               </div>
             </div>
-            
-            {/* Section 03: Cross-Chain Transfer */}
+
+            {/* Section 03: Mint OFT */}
             <div className="lz-section">
               <div className="lz-section-title">
                 <div className="lz-section-number">03 /</div>
+                <h3>Mint OFT</h3>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-8">
+                <div className="lz-card">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-medium text-layerzero-white mb-2">
+                      Solana Mint
+                    </h4>
+                    <p className="text-layerzero-gray-500 text-sm">
+                      View your balance and mint OFT tokens on Solana
+                    </p>
+                  </div>
+                  <SolanaWalletProvider>
+                    <SolanaMintCard />
+                  </SolanaWalletProvider>
+                </div>
+                
+                <div className="lz-card">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-medium text-layerzero-white mb-2">
+                      Ethereum Mint
+                    </h4>
+                    <p className="text-layerzero-gray-500 text-sm">
+                      View your balance and mint OFT tokens on Ethereum
+                    </p>
+                  </div>
+                  <EvmMintCard />
+                </div>
+              </div>
+            </div>
+            
+            {/* Section 04: Cross-Chain Transfer */}
+            <div className="lz-section">
+              <div className="lz-section-title">
+                <div className="lz-section-number">04 /</div>
                 <h3>Cross-Chain Transfer</h3>
               </div>
               <div className="grid lg:grid-cols-2 gap-8">
