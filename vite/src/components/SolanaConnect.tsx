@@ -23,7 +23,7 @@ export const SolanaConnect: FC = () => {
 
   return (
     <WalletModalProvider>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
         <style>
           {`
             .wallet-buttons-container {
@@ -39,21 +39,39 @@ export const SolanaConnect: FC = () => {
             .wallet-adapter-button {
               display: inline-flex !important;
               margin: 0 !important;
+              background-color: #000000 !important;
+              border: 1px solid #FFFFFF !important;
+              color: #FFFFFF !important;
+              border-radius: 0 !important;
+              padding: 0.75rem 1.5rem !important;
+              font-size: 0.875rem !important;
+              font-weight: 500 !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.05em !important;
+              transition: all 0.2s ease !important;
+            }
+            .wallet-adapter-button:hover {
+              background-color: #FFFFFF !important;
+              color: #000000 !important;
+            }
+            .wallet-adapter-button:disabled {
+              opacity: 0.5 !important;
+              cursor: not-allowed !important;
             }
           `}
         </style>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-xl font-medium text-layerzero-white mb-4">
           {connected ? "Solana Wallet Connected" : "Solana Wallet"}
         </h2>
         
         {connected ? (
           <div className="space-y-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-sm text-layerzero-gray-400">
               <span className="font-medium">Address:</span> {publicKey?.toString().slice(0, 6)}...{publicKey?.toString().slice(-4)}
             </div>
             <div className="text-sm">
-              <span className="font-medium text-gray-600 dark:text-gray-400">Cluster:</span>{' '}
-              <span className="font-medium text-blue-600 dark:text-blue-400">
+              <span className="font-medium text-layerzero-gray-400">Cluster:</span>{' '}
+              <span className="font-medium text-blue-400">
                 {clusterName}
               </span>
             </div>

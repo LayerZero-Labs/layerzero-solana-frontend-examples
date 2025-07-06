@@ -71,7 +71,7 @@ export default function SolanaOftCard() {
     const provider = getProvider();
     if (!provider || !programId) return null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new Program(oftIdl as any, programId, provider);
+    return new Program(oftIdl as any, provider);
   }, [getProvider, programId]);
 
   // ------------------------------------------------------------
@@ -224,11 +224,11 @@ export default function SolanaOftCard() {
   // ------------------------------------------------------------
   if (!tokenMint || !programId || !oftStore) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+        <h3 className="text-lg font-medium text-layerzero-white mb-4">
           Solana OFT
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-layerzero-gray-400">
           Loading contract configuration...
         </p>
       </div>
@@ -237,11 +237,11 @@ export default function SolanaOftCard() {
 
   if (!wallet) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+        <h3 className="text-lg font-medium text-layerzero-white mb-4">
           Solana OFT
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-layerzero-gray-400">
           Connect your wallet to view and mint OFT tokens.
         </p>
       </div>
@@ -249,24 +249,24 @@ export default function SolanaOftCard() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+      <h3 className="text-lg font-medium text-layerzero-white mb-4">
         Solana OFT
       </h3>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error}
         </div>
       )}
 
       <div className="space-y-4">
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
+          <h4 className="font-medium text-layerzero-white mb-2">
             Balance
           </h4>
           <div className="flex items-center justify-between">
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-layerzero-white">
               {isLoadingBalance
                 ? "Loading..."
                 : `${balance.uiAmount.toLocaleString()} OFT`}
@@ -274,17 +274,17 @@ export default function SolanaOftCard() {
             <button
               onClick={fetchBalance}
               disabled={isLoadingBalance}
-              className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded transition-colors duration-200"
+              className="lz-button text-xs py-2 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoadingBalance ? "Loading..." : "Refresh"}
             </button>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+          <p className="text-sm text-layerzero-gray-400 mt-1">
             <span className="font-medium">Mint:</span>
             <span className="font-mono text-xs ml-1">{tokenMint.toString()}</span>
           </p>
           {oftStore && (
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            <p className="text-sm text-layerzero-gray-400 mt-1">
               <span className="font-medium">OFT Store:</span>
               <span className="font-mono text-xs ml-1">{oftStore.toString()}</span>
             </p>
@@ -295,12 +295,12 @@ export default function SolanaOftCard() {
           <button
             onClick={handleMint}
             disabled={isMinting}
-            className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium rounded-lg transition-colors duration-200"
+            className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isMinting ? "Minting OFT Tokens..." : "Mint OFT Tokens"}
           </button>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <p className="text-xs text-layerzero-gray-500 text-center">
             Using the OFT Program's mock mint function (public)
           </p>
         </div>

@@ -54,11 +54,11 @@ export default function EvmOftCard() {
 
   if (!isConnected) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+        <h3 className="text-lg font-medium text-layerzero-white mb-4">
           EVM OFT
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-layerzero-gray-400">
           Connect your Ethereum wallet to view OFT balance and mint tokens.
         </p>
       </div>
@@ -66,26 +66,26 @@ export default function EvmOftCard() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+      <h3 className="text-lg font-medium text-layerzero-white mb-4">
         EVM OFT
       </h3>
       
       <div className="space-y-4">
         {!isCorrectNetwork && (
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+          <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                <p className="text-sm font-medium text-yellow-400">
                   Wrong Network
                 </p>
-                <p className="text-xs text-yellow-600 dark:text-yellow-300 mt-1">
+                <p className="text-xs text-layerzero-gray-400 mt-1">
                   Please switch to OP Sepolia to use OFT features
                 </p>
               </div>
               <button
                 onClick={handleSwitchNetwork}
-                className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded transition-colors"
+                className="lz-button text-xs py-2 px-3"
               >
                 Switch Network
               </button>
@@ -93,12 +93,12 @@ export default function EvmOftCard() {
           </div>
         )}
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Balance</h4>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
+          <h4 className="font-medium text-layerzero-white mb-2">Balance</h4>
+          <p className="text-2xl font-bold text-layerzero-white">
             {isCorrectNetwork && balance ? formatEther(balance) : '0'} OFT
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-layerzero-gray-400">
             <span className="font-medium">Contract:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function EvmOftCard() {
         <button
           onClick={handleMint}
           disabled={!isCorrectNetwork || isPending || isConfirming}
-          className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium rounded-lg transition-colors duration-200"
+          className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
            isPending ? 'Confirming...' : 
@@ -115,8 +115,8 @@ export default function EvmOftCard() {
         </button>
 
         {isConfirmed && isCorrectNetwork && (
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-200">
+          <div className="p-3 bg-layerzero-gray-800 border border-green-400 rounded-none">
+            <p className="text-sm text-green-400">
               ✅ Successfully minted 100 OFT tokens!
             </p>
           </div>

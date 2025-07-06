@@ -27,11 +27,11 @@
   }
   
   .lz-button {
-    @apply bg-transparent border border-layerzero-white text-layerzero-white hover:bg-layerzero-white hover:text-layerzero-black font-medium py-3 px-6 rounded-none transition-all duration-200 uppercase text-sm tracking-wider;
+    @apply bg-layerzero-black border border-layerzero-white text-layerzero-white hover:bg-layerzero-white hover:text-layerzero-black font-medium py-3 px-6 rounded-none transition-all duration-200 uppercase text-sm tracking-wider;
   }
   
   .lz-button-outline {
-    @apply bg-transparent border border-layerzero-white text-layerzero-white hover:bg-layerzero-white hover:text-layerzero-black font-medium py-3 px-6 rounded-none transition-all duration-200 uppercase text-sm tracking-wider;
+    @apply bg-layerzero-black border border-layerzero-white text-layerzero-white hover:bg-layerzero-white hover:text-layerzero-black font-medium py-3 px-6 rounded-none transition-all duration-200 uppercase text-sm tracking-wider;
   }
   
   .lz-input {

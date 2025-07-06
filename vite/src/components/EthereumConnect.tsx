@@ -12,23 +12,23 @@ export function EthereumConnect() {
 
   if (isConnected) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+        <h2 className="text-xl font-medium text-layerzero-white mb-4">
           Ethereum Wallet Connected
         </h2>
         <div className="space-y-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-layerzero-gray-400">
             <span className="font-medium">Address:</span> {address?.slice(0, 6)}...{address?.slice(-4)}
           </div>
           <div className="text-sm">
-            <span className="font-medium text-gray-600 dark:text-gray-400">Network:</span>{' '}
-            <span className={`font-medium ${isCorrectNetwork ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <span className="font-medium text-layerzero-gray-400">Network:</span>{' '}
+            <span className={`font-medium ${isCorrectNetwork ? 'text-green-400' : 'text-red-400'}`}>
               {networkName}
             </span>
           </div>
           <button
             onClick={() => disconnect()}
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full lz-button"
           >
             Disconnect
           </button>
@@ -38,8 +38,8 @@ export function EthereumConnect() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+      <h2 className="text-xl font-medium text-layerzero-white mb-4">
         Connect Ethereum Wallet
       </h2>
       <div className="space-y-3">
@@ -49,7 +49,7 @@ export function EthereumConnect() {
             onClick={() => connect({ connector })}
             type="button"
             disabled={status === 'pending'}
-            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {connector.name}
             {status === 'pending' && ' (connecting...)'}
@@ -57,7 +57,7 @@ export function EthereumConnect() {
         ))}
       </div>
       {error && (
-        <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mt-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error.message}
         </div>
       )}
