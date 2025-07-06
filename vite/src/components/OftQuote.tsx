@@ -202,12 +202,7 @@ export default function OftQuote() {
         }
       );
 
-      console.log("Latest native fee:", latestNativeFee.toString());
-
-      // First, let's simulate the transaction to get optimal compute units
-      console.log("Simulating transaction to get optimal compute units...");
-      
-      // Create the send instruction first
+      // Create send instruction 
       const sendIx = await oft.send(
         umi.rpc,
         {
@@ -310,24 +305,24 @@ export default function OftQuote() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+      <h2 className="text-2xl font-medium text-layerzero-white mb-6">
         Solana → EVM Transfer
       </h2>
 
       <div className="space-y-4 mb-6">
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Transfer Details</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
+          <h3 className="font-medium text-layerzero-white mb-2">Transfer Details</h3>
+          <p className="text-sm text-layerzero-gray-400">
             <span className="font-medium">Destination ({getNetworkName(chainId)}):</span> <span className="font-mono text-xs">{ethereumAddress || 'No Ethereum wallet connected'}</span>
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+          <p className="text-sm text-layerzero-gray-400 mt-1">
             <span className="font-medium">Destination Endpoint ID:</span> {toEid}
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-layerzero-white mb-2">
             Amount to Send
           </label>
           <input
@@ -336,7 +331,7 @@ export default function OftQuote() {
             onChange={(e) => setAmount(e.target.value)}
             step="0.01"
             min="0"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            className="lz-input w-full"
             placeholder="Enter amount"
             disabled={sendState.isLoading}
           />
@@ -346,7 +341,7 @@ export default function OftQuote() {
       <div className="space-y-3">
         <button 
           onClick={onClickQuote}
-          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!wallet.connected || !wallet.publicKey || !amount || !isEthereumConnected || !ethereumAddress || sendState.isLoading}
         >
           Get OFT Quote
@@ -355,7 +350,7 @@ export default function OftQuote() {
         {nativeFee !== null && (
           <button 
             onClick={onClickSend}
-            className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!wallet.connected || !wallet.publicKey || !amount || !isEthereumConnected || !ethereumAddress || sendState.isLoading || nativeFee === null}
           >
             {sendState.isLoading ? "Sending..." : "Send OFT"}
@@ -364,32 +359,32 @@ export default function OftQuote() {
       </div>
 
       {!isEthereumConnected && (
-        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+        <div className="mt-4 p-3 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
+          <p className="text-sm text-yellow-400">
             Please connect your Ethereum wallet to set the destination address.
           </p>
         </div>
       )}
 
       {nativeFee !== null && (
-        <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
-          <p className="text-sm text-green-800 dark:text-green-200">
+        <div className="mt-6 p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
+          <p className="text-sm text-green-400">
             <span className="font-medium">Quote Result (Native Fee):</span> {nativeFee.toString()}
           </p>
         </div>
       )}
 
       {sendState.error && (
-        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
-          <p className="text-sm text-red-800 dark:text-red-200">
+        <div className="mt-4 p-3 bg-layerzero-gray-800 border border-red-400 rounded-none">
+          <p className="text-sm text-red-400">
             <span className="font-medium">Error:</span> {sendState.error}
           </p>
         </div>
       )}
 
       {sendState.txHash && (
-        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
+        <div className="mt-4 p-3 bg-layerzero-gray-800 border border-blue-400 rounded-none">
+          <p className="text-sm text-blue-400">
             <span className="font-medium">Transaction Hash:</span> 
             <span className="font-mono text-xs ml-2">{sendState.txHash}</span>
           </p>
@@ -398,7 +393,7 @@ export default function OftQuote() {
               href={`https://solscan.io/tx/${sendState.txHash}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-blue-800 dark:text-blue-200 underline hover:no-underline"
+              className="text-sm text-blue-400 underline hover:no-underline"
             >
               View on Solscan
             </a>
@@ -406,7 +401,7 @@ export default function OftQuote() {
               href={`https://testnet.layerzeroscan.com/tx/${sendState.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-blue-800 dark:text-blue-200 underline hover:no-underline"
+              className="text-sm text-blue-400 underline hover:no-underline"
             >
               View on LayerZero Scan
             </a>

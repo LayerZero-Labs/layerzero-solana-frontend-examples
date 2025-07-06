@@ -90,11 +90,11 @@ export default function EvmOftSend() {
 
   if (!isConnected) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+        <h2 className="text-2xl font-medium text-layerzero-white mb-4">
           EVM → Solana Transfer
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-layerzero-gray-400">
           Please connect your Ethereum wallet to use this feature.
         </p>
       </div>
@@ -102,26 +102,26 @@ export default function EvmOftSend() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+    <div className="bg-layerzero-gray-900 border border-layerzero-gray-800 rounded-none p-6">
+      <h2 className="text-2xl font-medium text-layerzero-white mb-6">
         EVM → Solana Transfer
       </h2>
 
       <div className="space-y-4 mb-6">
         {!isCorrectNetwork && (
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+          <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                <p className="text-sm font-medium text-yellow-400">
                   Wrong Network
                 </p>
-                <p className="text-xs text-yellow-600 dark:text-yellow-300 mt-1">
+                <p className="text-xs text-layerzero-gray-400 mt-1">
                   Please switch to OP Sepolia to send tokens
                 </p>
               </div>
               <button
                 onClick={handleSwitchNetwork}
-                className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded transition-colors"
+                className="lz-button text-xs py-2 px-3"
               >
                 Switch Network
               </button>
@@ -129,23 +129,23 @@ export default function EvmOftSend() {
           </div>
         )}
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Your Balance</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
+          <h3 className="font-medium text-layerzero-white mb-2">Your Balance</h3>
+          <p className="text-sm text-layerzero-gray-400">
             {isCorrectNetwork && balance ? formatEther(balance) : '0'} OFT
           </p>
         </div>
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Contract Info</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
+          <h3 className="font-medium text-layerzero-white mb-2">Contract Info</h3>
+          <p className="text-sm text-layerzero-gray-400">
             <span className="font-medium">OP Sepolia OFT:</span> <span className="font-mono text-xs">{SEPOLIA_OFT_ADDRESS}</span>
           </p>
         </div>
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-layerzero-white mb-2">
               Amount to Send
             </label>
             <input
@@ -154,20 +154,20 @@ export default function EvmOftSend() {
               onChange={(e) => setAmount(e.target.value)}
               step="0.01"
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className="lz-input w-full"
               placeholder="Enter amount"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-layerzero-white mb-2">
               Recipient Address (Solana)
             </label>
             <input
               type="text"
               value={recipientAddress}
               onChange={(e) => setRecipientAddress(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className="lz-input w-full"
               placeholder="Enter Solana address"
             />
           </div>
@@ -177,7 +177,7 @@ export default function EvmOftSend() {
           <button
             onClick={getQuote}
             disabled={!isCorrectNetwork || isQuoting || !amount || !recipientAddress}
-            className="flex-1 py-2 px-4 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200"
+            className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {!isCorrectNetwork ? 'Wrong Network' : isQuoting ? 'Getting Quote...' : 'Get Quote'}
           </button>
@@ -185,7 +185,7 @@ export default function EvmOftSend() {
           <button
             onClick={sendTokens}
             disabled={!isCorrectNetwork || !quoteFee || isPending || isConfirming}
-            className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors duration-200"
+            className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
              isPending ? 'Confirming...' : 
@@ -195,20 +195,20 @@ export default function EvmOftSend() {
         </div>
 
         {quoteFee !== null && (
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="p-4 bg-layerzero-gray-800 border border-blue-400 rounded-none">
+            <p className="text-sm text-blue-400">
               <span className="font-medium">Estimated Fee:</span> {formatEther(quoteFee)} ETH
             </p>
           </div>
         )}
 
         {isConfirmed && (
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-200">
+          <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
+            <p className="text-sm text-green-400">
               <span className="font-medium">Transaction confirmed!</span>
             </p>
             {hash && (
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-mono">
+              <p className="text-xs text-green-400 mt-1 font-mono">
                 {hash}
               </p>
             )}
