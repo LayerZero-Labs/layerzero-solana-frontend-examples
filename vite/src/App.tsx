@@ -32,11 +32,11 @@ function App() {
             <div className="mb-16">
               <div className="max-w-4xl">
                 <h2 className="text-4xl font-bold text-layerzero-white mb-4 leading-tight">
-                  Build{" "}
+                  Demo:{" "}
                   <span className="text-layerzero-purple-500">
                     Omnichain
                   </span>
-                  {" "}Token Transfers
+                  {" "}Token Transfers using LayerZero
                 </h2>
                 <p className="text-layerzero-gray-400 text-lg mb-4 max-w-2xl">
                   Demo application showcasing seamless token transfers between Ethereum and Solana networks using LayerZero's omnichain infrastructure.

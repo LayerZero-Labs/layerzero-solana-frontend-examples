@@ -15,6 +15,7 @@ import {
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { CONTRACTS } from "../config/contracts";
 import oftIdl from "../solana/idl/oft.json";
+import type Oft from "../solana/idl/oft.json";
 
 interface TokenBalance {
   amount: number;
@@ -71,8 +72,8 @@ function useSolanaOft() {
   const getProgram = useCallback(() => {
     const provider = getProvider();
     if (!provider || !programId) return null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new Program(oftIdl as any, provider);
+    // @ts-expect-error - anchor types mismatch but it works
+    return new Program<typeof Oft>(oftIdl, programId, provider); // Note: do not change the order of the arguments. Maintain: idl, programId, provider (if on anchor v0.29)
   }, [getProvider, programId]);
 
   // ------------------------------------------------------------
@@ -155,6 +156,7 @@ function useSolanaOft() {
       setError("Wallet not connected or contracts not initialised");
       return;
     }
+    console.log('=== Minting ===');
 
     setIsMinting(true);
     setError(null);
@@ -175,6 +177,20 @@ function useSolanaOft() {
         ],
         programId
       );
+
+      console.log('=== Account Verification ===');
+      console.log('User:', wallet.publicKey.toString());
+      console.log('OftStore:', oftStore.toString());
+      console.log('TokenMint:', tokenMint.toString());
+      console.log('DailyMintLimit PDA:', dailyMintLimit.toString());
+      console.log('UserTokenAccount:', userTokenAccount.toString());
+      console.log('Program ID:', programId.toString());
+
+      // Verify ATA calculation
+      const expectedAta = await getAssociatedTokenAddress(tokenMint, wallet.publicKey);
+      console.log('Expected ATA:', expectedAta.toString());
+      console.log('Using ATA:', userTokenAccount.toString());
+      console.log('ATA Match:', expectedAta.equals(userTokenAccount));
 
       const signature = await program.methods
         .mintToken()
