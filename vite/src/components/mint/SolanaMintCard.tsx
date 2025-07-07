@@ -69,7 +69,7 @@ export default function SolanaMintCard() {
                 disabled={isMinting}
                 className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isMinting ? "Minting OFT Tokens..." : "Mint OFT Tokens"}
+                {isMinting ? "Minting 1 OFT token..." : "Mint 1 OFT token"}
               </button>
 
               <p className="text-xs text-layerzero-gray-500 text-center">

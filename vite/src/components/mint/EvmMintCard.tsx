@@ -68,7 +68,7 @@ export default function EvmMintCard() {
               {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
                isPending ? 'Confirming...' : 
                isConfirming ? 'Minting...' : 
-               'Mint OFT Tokens'}
+               'Mint 1 OFT token'}
             </button>
 
             {isConfirmed && isCorrectNetwork && (

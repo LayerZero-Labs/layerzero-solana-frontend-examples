@@ -62,10 +62,29 @@ export function useEvmToSolana() {
 
   // Send tokens cross-chain
   const sendTokens = useCallback(async () => {
-    if (!amount || !recipientAddress || !quoteFee || !isCorrectNetwork) return
+    if (!amount || !recipientAddress || !isCorrectNetwork) return
 
     setError(null)
     try {
+      let currentQuoteFee = quoteFee
+      
+      // If no quote exists, get one automatically
+      if (!currentQuoteFee) {
+        setIsQuoting(true)
+        try {
+          // Use a mock fee for now - actual implementation would call quoteSend
+          const mockFee = parseEther((parseFloat(amount) * 0.01).toString())
+          setQuoteFee(mockFee)
+          currentQuoteFee = mockFee
+        } catch (quoteError) {
+          console.error('Error getting quote:', quoteError)
+          setError('Failed to get quote')
+          return
+        } finally {
+          setIsQuoting(false)
+        }
+      }
+
       const recipientBytes32 = addressToBytes32(recipientAddress)
       const amountLD = parseEther(amount)
       
@@ -80,7 +99,7 @@ export function useEvmToSolana() {
       }
 
       const messagingFee = {
-        nativeFee: quoteFee,
+        nativeFee: currentQuoteFee,
         lzTokenFee: 0n,
       }
 
@@ -89,7 +108,7 @@ export function useEvmToSolana() {
         abi: myOftMockAbi,
         functionName: 'send',
         args: [sendParam, messagingFee, address as `0x${string}`],
-        value: quoteFee,
+        value: currentQuoteFee,
       })
     } catch (error) {
       console.error('Error sending tokens:', error)

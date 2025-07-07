@@ -109,14 +109,42 @@ export function useSolanaToEvm() {
       return;
     }
 
-    if (nativeFee === null) {
-      console.error("No quote available. Please get a quote first.");
-      return;
-    }
-
     setSendState({ isLoading: true, txHash: null, error: null });
 
     try {
+      let currentNativeFee = nativeFee;
+      
+      // If no quote exists, get one automatically
+      if (currentNativeFee === null) {
+        console.log("No quote available. Getting quote automatically...");
+        
+        const result = await withLoading('quote', async () => {
+          console.log("Using EndpointId:", toEid, "for chainId:", chainId);
+          console.log("Destination address:", recipientAddress);
+
+          return await getOftQuote({
+            umi: umiWithWallet,
+            contractValues,
+            walletPublicKey: walletReady.publicKey!,
+            recipientAddress,
+            amount,
+            toEid,
+          });
+        }, { logName: 'Quote' });
+
+        if (result !== undefined) {
+          setNativeFee(result);
+          currentNativeFee = result;
+        } else {
+          setSendState({ 
+            isLoading: false, 
+            txHash: null, 
+            error: "Failed to get quote automatically"
+          });
+          return;
+        }
+      }
+
       const signature = await sendOftTransaction({
         umi: umiWithWallet,
         contractValues,
@@ -124,7 +152,7 @@ export function useSolanaToEvm() {
         recipientAddress,
         amount,
         toEid,
-        nativeFee,
+        nativeFee: currentNativeFee,
       });
 
       const txHash = signature;
@@ -148,7 +176,9 @@ export function useSolanaToEvm() {
     nativeFee, 
     amount, 
     toEid, 
-    contractValues
+    contractValues,
+    withLoading,
+    chainId
   ]);
 
   return {
