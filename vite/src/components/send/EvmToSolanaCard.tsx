@@ -31,7 +31,7 @@ export default function EvmToSolanaCard() {
   return (
     <div className="space-y-4 mb-6">
       {error && (
-        <div className="mb-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
+        <div className="p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error}
         </div>
       )}
@@ -104,14 +104,14 @@ export default function EvmToSolanaCard() {
           {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
            isPending ? 'Confirming...' : 
            isConfirming ? 'Sending...' : 
-           'Send Tokens'}
+           `Send ${amount} Tokens`}
         </button>
       </div>
 
       {formattedQuoteFee && (
-        <div className="p-4 bg-layerzero-gray-800 border border-blue-400 rounded-none">
-          <p className="text-sm text-blue-400">
-            <span className="font-medium">Estimated Fee:</span> {formattedQuoteFee} ETH
+        <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
+          <p className="text-sm text-green-400">
+            <span className="font-medium">Quote Result (Native Fee):</span> {formattedQuoteFee} ETH
           </p>
         </div>
       )}
