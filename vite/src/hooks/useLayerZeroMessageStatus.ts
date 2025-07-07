@@ -19,7 +19,7 @@ interface UseLayerZeroMessageStatusReturn {
   error: string | null;
   refetch: () => Promise<void>;
   isFinalized: boolean;
-  status: 'LOADING' | 'INFLIGHT' | 'PENDING' | 'DELIVERED' | 'FAILED' | 'SUCCEEDED' | 'NOT_FOUND' | 'ERROR';
+  status: 'LOADING' | 'INDEXING' | 'INFLIGHT' | 'PENDING' | 'DELIVERED' | 'FAILED' | 'SUCCEEDED' | 'NOT_FOUND' | 'ERROR';
 }
 
 export function useLayerZeroMessageStatus({
@@ -32,7 +32,7 @@ export function useLayerZeroMessageStatus({
   const [message, setMessage] = useState<LayerZeroMessage | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<'LOADING' | 'INFLIGHT' | 'PENDING' | 'DELIVERED' | 'FAILED' | 'SUCCEEDED' | 'NOT_FOUND' | 'ERROR'>('LOADING');
+  const [status, setStatus] = useState<'LOADING' | 'INDEXING' | 'INFLIGHT' | 'PENDING' | 'DELIVERED' | 'FAILED' | 'SUCCEEDED' | 'NOT_FOUND' | 'ERROR'>('LOADING');
   const pollAttempts = useRef(0);
   const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -119,7 +119,7 @@ export function useLayerZeroMessageStatus({
       } else {
         // Message not found (404) - this is normal initially
         if (pollAttempts.current === 0) {
-          setStatus('INFLIGHT'); // Show as INFLIGHT initially when not found
+          setStatus('INDEXING'); // Show as INDEXING initially when not found
         }
         
         // Continue polling if enabled and under max attempts
