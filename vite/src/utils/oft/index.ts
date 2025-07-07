@@ -1,2 +1,5 @@
 // Solana OFT utilities
-export * from './solana'; 
+export * from './solana';
+
+// EVM OFT utilities
+export * from './evm'; 
