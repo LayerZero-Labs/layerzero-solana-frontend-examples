@@ -1,5 +1,6 @@
 import { useLayerZeroMessageStatus } from '../hooks/useLayerZeroMessageStatus';
 import { LAYERZERO_SCAN_CONFIG } from '../config/contracts';
+import { LayerZeroMessage } from '../utils/layerzero-scan';
 
 interface MessageStatusDisplayProps {
   txHash?: string;
@@ -66,6 +67,27 @@ export function MessageStatusDisplay({
     }
   };
 
+  const getDvnStatus = (message: LayerZeroMessage) => {
+    if (!message?.verification?.dvn?.status) {
+      return 'WAITING';
+    }
+    return message.verification.dvn.status === 'SUCCEEDED' ? 'VERIFIED' : 'WAITING';
+  };
+
+  const getDvnStatusColor = (dvnStatus: string) => {
+    switch (dvnStatus) {
+      case 'VERIFIED':
+        return 'text-green-400';
+      case 'WAITING':
+        return 'text-yellow-400';
+      default:
+        return 'text-gray-400';
+    }
+  };
+
+  const dvnStatus = message ? getDvnStatus(message) : 'WAITING';
+  const dvnStatusColor = getDvnStatusColor(dvnStatus);
+
   const explorerUrl = LAYERZERO_SCAN_CONFIG[environment].explorerUrl;
 
   return (
@@ -102,6 +124,19 @@ export function MessageStatusDisplay({
         
         <div className="text-xs text-gray-400">
           {getStatusDisplay(status)}
+        </div>
+
+        {/* DVN Verification Status */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-gray-400">DVN Verification:</span>
+          <span className={`font-medium ${dvnStatusColor}`}>
+            {dvnStatus}
+          </span>
+          {dvnStatus === 'WAITING' && (
+            <div className="animate-pulse">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+            </div>
+          )}
         </div>
 
         {message && message.destination.tx?.txHash && (
