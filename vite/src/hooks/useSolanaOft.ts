@@ -1,5 +1,5 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   PublicKey,
   SystemProgram,
@@ -13,9 +13,11 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import { CONTRACTS } from "../config/contracts";
 import oftIdl from "../solana/idl/oft.json";
 import type Oft from "../solana/idl/oft.json";
+
+// Import utilities
+import { useStableSolanaContractsWeb3, useWalletReady } from './utils';
 
 interface TokenBalance {
   amount: number;
@@ -43,31 +45,19 @@ export function useSolanaOft() {
   });
   const [error, setError] = useState<string | null>(null);
 
-  // ------------------------------------------------------------
-  // Program‑level constants
-  // ------------------------------------------------------------
-  const { tokenMint, programId, oftStore } = useMemo(() => {
-    try {
-      return {
-        tokenMint: new PublicKey(CONTRACTS.SOLANA_OFT_MINT_ADDRESS),
-        programId: new PublicKey(CONTRACTS.SOLANA_PROGRAM_ADDRESS),
-        oftStore: new PublicKey(CONTRACTS.SOLANA_OFT_STORE_ADDRESS),
-      };
-    } catch (e) {
-      console.error("Error parsing addresses", e);
-      return { tokenMint: null, programId: null, oftStore: null } as const;
-    }
-  }, []);
+  // Use utility hooks
+  const walletReady = useWalletReady();
+  const contractValues = useStableSolanaContractsWeb3();
 
   // ------------------------------------------------------------
   // Anchor helpers
   // ------------------------------------------------------------
   const getProvider = useCallback(() => {
-    if (!wallet.connected || !wallet.publicKey || !wallet.signTransaction) return null;
+    if (!walletReady.isReady || !wallet.signTransaction) return null;
     
     // Create anchor-compatible wallet from the main wallet
     const anchorWallet = {
-      publicKey: wallet.publicKey,
+      publicKey: wallet.publicKey!,
       signTransaction: wallet.signTransaction,
       signAllTransactions: wallet.signAllTransactions || (async (txs) => {
         // Fallback: sign transactions one by one if signAllTransactions is not available
@@ -82,29 +72,29 @@ export function useSolanaOft() {
     return new AnchorProvider(connection, anchorWallet, {
       commitment: "confirmed",
     });
-  }, [connection, wallet]);
+  }, [connection, wallet, walletReady.isReady]);
 
   const getProgram = useCallback(() => {
     const provider = getProvider();
-    if (!provider || !programId) return null;
+    if (!provider || !contractValues.programId) return null;
     // @ts-expect-error - anchor types mismatch but it works
-    return new Program<typeof Oft>(oftIdl, programId, provider); // Note: do not change the order of the arguments. Maintain: idl, programId, provider (if on anchor v0.29)
-  }, [getProvider, programId]);
+    return new Program<typeof Oft>(oftIdl, contractValues.programId, provider); // Note: do not change the order of the arguments. Maintain: idl, programId, provider (if on anchor v0.29)
+  }, [getProvider, contractValues.programId]);
 
   // ------------------------------------------------------------
   // Balance
   // ------------------------------------------------------------
   const fetchBalance = useCallback(async () => {
-    if (!wallet.connected || !wallet.publicKey || !tokenMint) return;
+    if (!walletReady.isReady || !contractValues.tokenMint) return;
 
     setIsLoadingBalance(true);
     setError(null);
 
     try {
-      const ata = await getAssociatedTokenAddress(tokenMint, wallet.publicKey);
+      const ata = await getAssociatedTokenAddress(contractValues.tokenMint, wallet.publicKey!);
       const account = await getAccount(connection, ata);
 
-      const mintInfo = await connection.getParsedAccountInfo(tokenMint);
+      const mintInfo = await connection.getParsedAccountInfo(contractValues.tokenMint);
       const decimals =
         mintInfo.value?.data && "parsed" in mintInfo.value.data
           ? (mintInfo.value.data.parsed.info.decimals as number) ?? 6
@@ -125,16 +115,16 @@ export function useSolanaOft() {
     } finally {
       setIsLoadingBalance(false);
     }
-  }, [connection, tokenMint, wallet.connected, wallet.publicKey]);
+  }, [connection, contractValues.tokenMint, walletReady.isReady, wallet.publicKey]);
 
   // ------------------------------------------------------------
   // Associated Token Account
   // ------------------------------------------------------------
   const createAssociatedTokenAccount = useCallback(
     async (user: PublicKey): Promise<PublicKey> => {
-      if (!tokenMint) throw new Error("Token mint not initialised");
+      if (!contractValues.tokenMint) throw new Error("Token mint not initialised");
 
-      const ata = await getAssociatedTokenAddress(tokenMint, user);
+      const ata = await getAssociatedTokenAddress(contractValues.tokenMint, user);
 
       try {
         await getAccount(connection, ata);
@@ -145,7 +135,7 @@ export function useSolanaOft() {
             user,
             ata,
             user,
-            tokenMint
+            contractValues.tokenMint
           );
 
           const provider = getProvider();
@@ -160,14 +150,14 @@ export function useSolanaOft() {
         throw err;
       }
     },
-    [connection, getProvider, tokenMint]
+    [connection, getProvider, contractValues.tokenMint]
   );
 
   // ------------------------------------------------------------
   // Mint
   // ------------------------------------------------------------
   const handleMint = useCallback(async () => {
-    if (!wallet.connected || !wallet.publicKey || !tokenMint || !programId || !oftStore) {
+    if (!walletReady.isReady || !contractValues.tokenMint || !contractValues.programId || !contractValues.oftStore) {
       setError("Wallet not connected or contracts not initialised");
       return;
     }
@@ -182,27 +172,27 @@ export function useSolanaOft() {
       if (!provider || !program) throw new Error("Provider / Program missing");
 
       const userTokenAccount = await createAssociatedTokenAccount(
-        wallet.publicKey
+        wallet.publicKey!
       );
 
       const [dailyMintLimit] = PublicKey.findProgramAddressSync(
         [
           Buffer.from("DailyMintLimit"),
-          wallet.publicKey.toBuffer(),
+          wallet.publicKey!.toBuffer(),
         ],
-        programId
+        contractValues.programId
       );
 
       console.log('=== Account Verification ===');
-      console.log('User:', wallet.publicKey.toString());
-      console.log('OftStore:', oftStore.toString());
-      console.log('TokenMint:', tokenMint.toString());
+      console.log('User:', wallet.publicKey!.toString());
+      console.log('OftStore:', contractValues.oftStore.toString());
+      console.log('TokenMint:', contractValues.tokenMint.toString());
       console.log('DailyMintLimit PDA:', dailyMintLimit.toString());
       console.log('UserTokenAccount:', userTokenAccount.toString());
-      console.log('Program ID:', programId.toString());
+      console.log('Program ID:', contractValues.programId.toString());
 
       // Verify ATA calculation
-      const expectedAta = await getAssociatedTokenAddress(tokenMint, wallet.publicKey);
+      const expectedAta = await getAssociatedTokenAddress(contractValues.tokenMint, wallet.publicKey!);
       console.log('Expected ATA:', expectedAta.toString());
       console.log('Using ATA:', userTokenAccount.toString());
       console.log('ATA Match:', expectedAta.equals(userTokenAccount));
@@ -210,9 +200,9 @@ export function useSolanaOft() {
       const signature = await program.methods
         .mintToken()
         .accounts({
-          user: wallet.publicKey,
-          oftStore,
-          tokenMint,
+          user: wallet.publicKey!,
+          oftStore: contractValues.oftStore,
+          tokenMint: contractValues.tokenMint,
           dailyMintLimit,
           userTokenAccount,
           tokenProgram: TOKEN_PROGRAM_ID,
@@ -233,11 +223,11 @@ export function useSolanaOft() {
       setIsMinting(false);
     }
   }, [
-    wallet.connected,
+    walletReady.isReady,
     wallet.publicKey,
-    tokenMint,
-    programId,
-    oftStore,
+    contractValues.tokenMint,
+    contractValues.programId,
+    contractValues.oftStore,
     getProvider,
     getProgram,
     createAssociatedTokenAccount,
@@ -249,14 +239,14 @@ export function useSolanaOft() {
   // Effects
   // ------------------------------------------------------------
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey) {
+    if (walletReady.isReady) {
       fetchBalance();
     } else {
       // Reset state when wallet disconnects
       setBalance({ amount: 0, decimals: 6, uiAmount: 0 });
       setError(null);
     }
-  }, [wallet.connected, wallet.publicKey, fetchBalance]);
+  }, [walletReady.isReady, fetchBalance]);
 
   return {
     wallet,
@@ -264,9 +254,9 @@ export function useSolanaOft() {
     isLoadingBalance,
     isMinting,
     error,
-    tokenMint,
-    programId,
-    oftStore,
+    tokenMint: contractValues.tokenMint,
+    programId: contractValues.programId,
+    oftStore: contractValues.oftStore,
     fetchBalance,
     handleMint,
   };

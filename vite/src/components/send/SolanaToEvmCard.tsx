@@ -1,4 +1,3 @@
-"use client";
 import { useSolanaToEvm } from '../../hooks/useSolanaToEvm'
 import { MessageStatusDisplay } from '../MessageStatusDisplay'
 
@@ -13,6 +12,7 @@ export default function SolanaToEvmCard() {
     recipientAddress,
     setRecipientAddress,
     nativeFee,
+    isQuoting,
     sendState,
     onClickQuote,
     onClickSend,
@@ -35,7 +35,7 @@ export default function SolanaToEvmCard() {
             min="0"
             className="lz-input w-full"
             placeholder="Enter amount"
-            disabled={sendState.isLoading}
+            disabled={sendState.isLoading || isQuoting}
           />
         </div>
 
@@ -49,7 +49,7 @@ export default function SolanaToEvmCard() {
             onChange={(e) => setRecipientAddress(e.target.value)}
             className="lz-input w-full"
             placeholder="Enter Ethereum address"
-            disabled={sendState.isLoading}
+            disabled={sendState.isLoading || isQuoting}
           />
         </div>
       </div>
@@ -58,15 +58,15 @@ export default function SolanaToEvmCard() {
         <button 
           onClick={onClickQuote}
           className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading}
+          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || isQuoting}
         >
-          Get Quote
+          {isQuoting ? "Getting Quote..." : "Get Quote"}
         </button>
 
         <button 
           onClick={onClickSend}
           className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || nativeFee === null}
+          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || nativeFee === null || isQuoting}
         >
           {sendState.isLoading ? "Sending..." : `Send ${amount} Tokens`}
         </button>
@@ -80,7 +80,15 @@ export default function SolanaToEvmCard() {
         </div>
       )}
 
-      {nativeFee !== null && (
+      {isQuoting && (
+        <div className="p-3 bg-layerzero-gray-800 border border-blue-400 rounded-none">
+          <p className="text-sm text-blue-400">
+            <span className="font-medium">Getting quote...</span> Please wait while we fetch the cross-chain fee.
+          </p>
+        </div>
+      )}
+
+      {nativeFee !== null && !isQuoting && (
         <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
           <p className="text-sm text-green-400">
             <span className="font-medium">Quote Result (Native Fee):</span> {nativeFee.toString()}
