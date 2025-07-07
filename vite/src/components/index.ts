@@ -8,4 +8,7 @@ export * from './oft';
 export * from './mint';
 
 // Transfer/Send components
-export * from './send'; 
+export * from './send';
+
+// Message status components
+export { MessageStatusDisplay } from './MessageStatusDisplay'; 

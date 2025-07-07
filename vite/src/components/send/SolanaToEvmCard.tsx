@@ -1,5 +1,6 @@
 "use client";
 import { useSolanaToEvm } from '../../hooks/useSolanaToEvm'
+import { MessageStatusDisplay } from '../MessageStatusDisplay'
 
 export default function SolanaToEvmCard() {
   const {
@@ -96,29 +97,36 @@ export default function SolanaToEvmCard() {
       )}
 
       {sendState.txHash && (
-        <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
-          <p className="text-sm text-green-400">
-            <span className="font-medium">Transaction Hash:</span> 
-            <span className="font-mono text-xs ml-2">{sendState.txHash}</span>
-          </p>
-          <div className="flex gap-4 mt-2">
-            <a 
-              href={`https://solscan.io/tx/${sendState.txHash}?cluster=devnet`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-green-400 underline hover:no-underline"
-            >
-              View on Solscan
-            </a>
-            <a 
-              href={`https://testnet.layerzeroscan.com/tx/${sendState.txHash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-green-400 underline hover:no-underline"
-            >
-              View on LayerZero Scan
-            </a>
+        <div className="space-y-4">
+          <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
+            <p className="text-sm text-green-400">
+              <span className="font-medium">Transaction Hash:</span> 
+              <span className="font-mono text-xs ml-2">{sendState.txHash}</span>
+            </p>
+            <div className="flex gap-4 mt-2">
+              <a 
+                href={`https://solscan.io/tx/${sendState.txHash}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-green-400 underline hover:no-underline"
+              >
+                View on Solscan
+              </a>
+              <a 
+                href={`https://testnet.layerzeroscan.com/tx/${sendState.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-green-400 underline hover:no-underline"
+              >
+                View on LayerZero Scan
+              </a>
+            </div>
           </div>
+          
+          <MessageStatusDisplay 
+            txHash={sendState.txHash}
+            environment="TESTNET"
+          />
         </div>
       )}
     </div>

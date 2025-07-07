@@ -13,6 +13,22 @@ export const DEFAULT_CONTRACTS = {
   DEFAULT_SEPOLIA_WALLET: '2uWbuRdAPxwU6XJ4mF3DfFL3vvrqE2qwbkUqYN2YmYBF',
 } as const
 
+// LayerZero Scan API configuration
+export const LAYERZERO_SCAN_CONFIG = {
+  MAINNET: {
+    baseUrl: 'https://scan.layerzero-api.com/v1',
+    name: 'mainnet',
+    explorerUrl: 'https://layerzeroscan.com'
+  },
+  TESTNET: {
+    baseUrl: 'https://scan-testnet.layerzero-api.com/v1',
+    name: 'testnet',
+    explorerUrl: 'https://testnet.layerzeroscan.com'
+  }
+} as const
+
+export type LayerZeroEnvironment = keyof typeof LAYERZERO_SCAN_CONFIG
+
 // Environment variable getters with fallbacks
 export const getContractAddresses = () => {
   // Use default values if environment variables are not defined or empty
