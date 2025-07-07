@@ -1,4 +1,5 @@
 import { useEvmToSolana } from '../../hooks/useEvmToSolana'
+import { MessageStatusDisplay } from '../MessageStatusDisplay'
 
 export default function EvmToSolanaCard() {
   const {
@@ -117,32 +118,43 @@ export default function EvmToSolanaCard() {
       )}
 
       {isConfirmed && (
-        <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
-          <p className="text-sm text-green-400">
-            <span className="font-medium">Transaction Hash:</span>
+        <div className="space-y-4">
+          <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
+            <p className="text-sm text-green-400">
+              <span className="font-medium">Transaction Hash:</span>
+              {hash && (
+                <span className="font-mono text-xs ml-2">{hash}</span>
+              )}
+            </p>
             {hash && (
-              <span className="font-mono text-xs ml-2">{hash}</span>
+              <div className="flex gap-4 mt-2">
+                <a 
+                  href={`https://optimism-sepolia.blockscout.com/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-green-400 underline hover:no-underline"
+                >
+                  View on OP Sepolia Explorer
+                </a>
+                <a 
+                  href={`https://testnet.layerzeroscan.com/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-green-400 underline hover:no-underline"
+                >
+                  View on LayerZero Scan
+                </a>
+              </div>
             )}
-          </p>
+          </div>
+          
+          {/* Cross-Chain Message Status */}
           {hash && (
-            <div className="flex gap-4 mt-2">
-              <a 
-                href={`https://optimism-sepolia.blockscout.com/tx/${hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-green-400 underline hover:no-underline"
-              >
-                View on OP Sepolia Explorer
-              </a>
-              <a 
-                href={`https://testnet.layerzeroscan.com/tx/${hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-green-400 underline hover:no-underline"
-              >
-                View on LayerZero Scan
-              </a>
-            </div>
+            <MessageStatusDisplay 
+              txHash={hash}
+              environment="TESTNET"
+              className="mt-4"
+            />
           )}
         </div>
       )}
