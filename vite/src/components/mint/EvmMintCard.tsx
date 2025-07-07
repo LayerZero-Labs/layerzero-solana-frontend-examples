@@ -1,59 +1,25 @@
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
-import { formatEther, parseEther } from 'viem'
-import { optimismSepolia } from 'wagmi/chains'
-import { CONTRACTS } from '../../config/contracts'
-import { myOftMockAbi } from '../../evm/MyOFTMock'
+import { useEvmOft } from '../../hooks/useEvmOft'
 
 export default function EvmMintCard() {
-  const { address, isConnected } = useAccount()
-  const chainId = useChainId()
-  const { switchChain } = useSwitchChain()
-  const { writeContract, data: hash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  const isCorrectNetwork = chainId === optimismSepolia.id
-
-  const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
-
-  // Read user's token balance
-  const { data: balance, refetch: refetchBalance } = useReadContract({
-    address: SEPOLIA_OFT_ADDRESS,
-    abi: myOftMockAbi,
-    functionName: 'balanceOf',
-    args: [address as `0x${string}`],
-    query: { enabled: !!address }
-  })
-
-  const handleMint = async () => {
-    if (!address || !isCorrectNetwork) return
-
-    try {
-      writeContract({
-        address: SEPOLIA_OFT_ADDRESS,
-        abi: myOftMockAbi,
-        functionName: 'mint',
-        args: [address, parseEther('1')], // Mint 1 OFT tokens
-      })
-    } catch (error) {
-      console.error('Error minting:', error)
-    }
-  }
-
-  const handleSwitchNetwork = () => {
-    switchChain({ chainId: optimismSepolia.id })
-  }
-
-  // Refetch balance when transaction is confirmed
-  if (isConfirmed) {
-    setTimeout(() => {
-      refetchBalance()
-    }, 1000)
-  }
+  const {
+    isConnected,
+    isCorrectNetwork,
+    formattedBalance,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    handleMint,
+    handleSwitchNetwork,
+  } = useEvmOft()
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="mb-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
+          {error}
+        </div>
+      )}
         {/* Wallet-specific functionality */}
         {!isConnected ? (
           <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
@@ -89,7 +55,7 @@ export default function EvmMintCard() {
             <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
               <h4 className="font-medium text-layerzero-white mb-2">Your Balance</h4>
               <p className="text-2xl font-bold text-layerzero-white">
-                {isCorrectNetwork && balance ? formatEther(balance) : '0'} OFT
+                {isCorrectNetwork ? formattedBalance : '0'} OFT
               </p>
             </div>
 
@@ -108,7 +74,7 @@ export default function EvmMintCard() {
             {isConfirmed && isCorrectNetwork && (
               <div className="p-3 bg-layerzero-gray-800 border border-green-400 rounded-none">
                 <p className="text-sm text-green-400">
-                  ✅ Successfully minted 100 OFT tokens!
+                  ✅ Successfully minted 1 OFT token!
                 </p>
               </div>
             )}
