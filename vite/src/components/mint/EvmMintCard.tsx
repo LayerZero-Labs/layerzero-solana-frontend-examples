@@ -1,6 +1,11 @@
 import { useEvmOft } from '../../hooks/useEvmOft'
+import { getNetworkName } from '../../utils/network'
+import { useChainId } from 'wagmi'
 
 export default function EvmMintCard() {
+  const chainId = useChainId()
+  const networkName = getNetworkName(chainId)
+  
   const {
     isConnected,
     isCorrectNetwork,
@@ -24,7 +29,7 @@ export default function EvmMintCard() {
         {!isConnected ? (
           <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
             <p className="text-sm text-layerzero-gray-400 text-center">
-              Connect your Ethereum wallet to view balance and mint tokens
+              Connect your {networkName} wallet to view balance and mint tokens
             </p>
           </div>
         ) : (

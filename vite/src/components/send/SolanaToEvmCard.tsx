@@ -48,7 +48,7 @@ export default function SolanaToEvmCard() {
             value={recipientAddress}
             onChange={(e) => setRecipientAddress(e.target.value)}
             className="lz-input w-full"
-            placeholder="Enter Ethereum address"
+            placeholder={`Enter ${getNetworkName(chainId)} address`}
             disabled={sendState.isLoading || isQuoting}
           />
         </div>

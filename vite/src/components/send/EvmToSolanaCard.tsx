@@ -1,7 +1,12 @@
 import { useEvmToSolana } from '../../hooks/useEvmToSolana'
 import { MessageStatusDisplay } from '../MessageStatusDisplay'
+import { getNetworkName } from '../../utils/network'
+import { useChainId } from 'wagmi'
 
 export default function EvmToSolanaCard() {
+  const chainId = useChainId()
+  const networkName = getNetworkName(chainId)
+  
   const {
     isConnected,
     isCorrectNetwork,
@@ -24,7 +29,7 @@ export default function EvmToSolanaCard() {
   if (!isConnected) {
     return (
       <p className="text-layerzero-gray-400">
-        Please connect your Ethereum wallet to use this feature.
+        Please connect your {networkName} wallet to use this feature.
       </p>
     )
   }
