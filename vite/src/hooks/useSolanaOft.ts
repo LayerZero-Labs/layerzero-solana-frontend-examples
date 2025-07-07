@@ -13,8 +13,8 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import oftIdl from "../solana/idl/oft.json";
-import type Oft from "../solana/idl/oft.json";
+import oftIdl from "../vm-artifacts/solana/idl/oft.json";
+import type Oft from "../vm-artifacts/solana/idl/oft.json";
 
 // Import utilities
 import { useStableSolanaContractsWeb3, useWalletReady } from './utils';

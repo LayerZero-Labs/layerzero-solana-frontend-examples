@@ -3,7 +3,7 @@ import { formatEther, parseEther } from 'viem'
 import { optimismSepolia } from 'wagmi/chains'
 import { useState, useEffect, useCallback } from 'react'
 import { CONTRACTS } from '../config/contracts'
-import { myOftMockAbi } from '../evm/MyOFTMock'
+import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
 
 export function useEvmOft() {
   const { address, isConnected } = useAccount()
