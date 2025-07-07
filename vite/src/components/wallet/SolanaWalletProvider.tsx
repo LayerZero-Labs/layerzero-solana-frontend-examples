@@ -1,4 +1,3 @@
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -13,7 +12,7 @@ type Props = {
 // Use environment variable or default to devnet to match contract deployment
 const endpoint = import.meta.env.VITE_SOLANA_RPC_ENDPOINT || clusterApiUrl('devnet');
 
-const wallets = [new PhantomWalletAdapter()];
+const wallets = [];
 
 export const SolanaWalletProvider: FC<Props> = ({ children }) => {
   return (
