@@ -54,29 +54,27 @@ export default function SolanaToEvmCard() {
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <button 
-          onClick={onClickQuote}
-          className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || isQuoting}
-        >
-          {isQuoting ? "Getting Quote..." : "Get Quote"}
-        </button>
-
-        <button 
-          onClick={onClickSend}
-          className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || isQuoting}
-        >
-          {sendState.isLoading ? "Sending..." : 
-           isQuoting ? "Getting quote..." : 
-           `Send ${amount} Tokens`}
-        </button>
-      </div>
+      <button 
+        onClick={onClickSend}
+        className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || isQuoting}
+      >
+        {sendState.isLoading ? "Sending..." : 
+         isQuoting ? "Getting quote..." : 
+         `Send ${amount} Tokens`}
+      </button>
 
       <p className="text-xs text-layerzero-gray-500 text-center">
         The send button will trigger a call to quote, so it's not necessary for you to manually call quote via the Get Quote button. It is there purely for demonstration purposes.
       </p>
+
+      <button 
+        onClick={onClickQuote}
+        className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!wallet.connected || !wallet.publicKey || !amount || !recipientAddress || sendState.isLoading || isQuoting}
+      >
+        {isQuoting ? "Getting Quote..." : "Get Quote"}
+      </button>
 
       {!recipientAddress && (
         <div className="p-3 bg-layerzero-gray-800 border border-yellow-400 rounded-none">

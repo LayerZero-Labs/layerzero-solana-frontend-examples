@@ -88,31 +88,29 @@ export default function EvmToSolanaCard() {
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={getQuote}
-          disabled={!isCorrectNetwork || isQuoting || !amount || !recipientAddress}
-          className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {!isCorrectNetwork ? 'Wrong Network' : isQuoting ? 'Getting Quote...' : 'Get Quote'}
-        </button>
-
-        <button
-          onClick={sendTokens}
-          disabled={!isCorrectNetwork || !amount || !recipientAddress || isPending || isConfirming || isQuoting}
-          className="flex-1 lz-button disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
-           isPending ? 'Confirming...' : 
-           isConfirming ? 'Sending...' : 
-           isQuoting ? 'Getting quote...' :
-           `Send ${amount} Tokens`}
-        </button>
-      </div>
+      <button
+        onClick={sendTokens}
+        disabled={!isCorrectNetwork || !amount || !recipientAddress || isPending || isConfirming || isQuoting}
+        className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
+         isPending ? 'Confirming...' : 
+         isConfirming ? 'Sending...' : 
+         isQuoting ? 'Getting quote...' :
+         `Send ${amount} Tokens`}
+      </button>
 
       <p className="text-xs text-layerzero-gray-500 text-center">
         The send button will trigger a call to quote, so it's not necessary for you to manually call quote via the Get Quote button. It is there purely for demonstration purposes.
       </p>
+
+      <button
+        onClick={getQuote}
+        disabled={!isCorrectNetwork || isQuoting || !amount || !recipientAddress}
+        className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {!isCorrectNetwork ? 'Wrong Network' : isQuoting ? 'Getting Quote...' : 'Get Quote'}
+      </button>
 
       {formattedQuoteFee && (
         <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
