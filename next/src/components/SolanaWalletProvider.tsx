@@ -1,4 +1,5 @@
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { Adapter } from '@solana/wallet-adapter-base';
+// import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -13,7 +14,7 @@ type Props = {
 // Mainnet-beta is the actuall mainnet (as of writing)
 const endpoint = clusterApiUrl('mainnet-beta');
 
-const wallets = [new PhantomWalletAdapter()];
+const wallets: Adapter[] = [];
 
 export const SolanaWalletProvider: FC<Props> = ({ children }) => {
   return (
