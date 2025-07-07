@@ -44,7 +44,7 @@ function AppContent() {
                 {" "}Token Transfers using LayerZero
               </h2>
               <p className="text-layerzero-gray-400 text-lg mb-4 max-w-2xl">
-                Demo application showcasing seamless token transfers between {networkName} and Solana networks using LayerZero's <a href="https://docs.layerzero.network/v2/concepts/glossary#oft-omnichain-fungible-token" target="_blank" rel="noopener noreferrer" className="text-layerzero-purple-500 hover:text-layerzero-purple-400 underline">OFT</a> standard.
+                Demo application showcasing seamless token transfers between <span className="font-semi text-layerzero-white">{networkName}</span> and <span className="font-semi text-layerzero-white">Solana</span> using LayerZero's <a href="https://docs.layerzero.network/v2/concepts/glossary#oft-omnichain-fungible-token" target="_blank" rel="noopener noreferrer" className="font-semi text-layerzero-white hover:text-layerzero-purple-400 underline">OFT</a> standard.
               </p>
               <div className="lz-protocol-text">
                 /// Demo Only. Not for Production Use.
