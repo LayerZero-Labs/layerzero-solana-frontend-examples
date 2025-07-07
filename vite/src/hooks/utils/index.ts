@@ -11,4 +11,4 @@ export * from './loading';
 export * from './contracts';
 
 // Solana OFT utilities
-export * from './solana-oft'; 
+export * from '../../utils/oft'; 
