@@ -10,7 +10,7 @@ export const wagmiConfig = createConfig({
   connectors: [
     injected(),
     metaMask(),
-    walletConnect({ projectId }),
+    // walletConnect({ projectId }),
   ],
   transports: {
     [optimismSepolia.id]: http(),

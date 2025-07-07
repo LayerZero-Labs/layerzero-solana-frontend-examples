@@ -11,8 +11,7 @@ type Props = {
   readonly children: React.ReactNode;
 };
 
-// Mainnet-beta is the actuall mainnet (as of writing)
-const endpoint = clusterApiUrl('mainnet-beta');
+const endpoint = clusterApiUrl('devnet'); // default to devnet
 
 const wallets: Adapter[] = [];
 
