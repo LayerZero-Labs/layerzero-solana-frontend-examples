@@ -1,6 +1,5 @@
 import { useEvmOft } from '../../hooks/useEvmOft'
 import { useChainId } from 'wagmi'
-import { useEffect } from 'react';
 
 export default function EvmMintCard() {
   const chainId = useChainId()

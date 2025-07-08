@@ -7,8 +7,18 @@ export function EthereumConnect() {
   const { connectors, connect, status, error } = useConnect()
   const { disconnect } = useDisconnect()
 
-  const isCorrectNetwork = chainId === optimismSepolia.id
-  const networkName = isCorrectNetwork ? 'OP Sepolia' : 'Wrong Network'
+  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
+  let actualChainId: number | null = null;
+  if (window?.ethereum?.chainId) {
+    try {
+      actualChainId = parseInt(window.ethereum.chainId, 16);
+    } catch {
+      actualChainId = null;
+    }
+  }
+  if (!actualChainId) actualChainId = chainId;
+  const isCorrectNetwork = actualChainId === optimismSepolia.id;
+  const networkName = isCorrectNetwork ? 'OP Sepolia' : `Wrong Network (Chain ID: ${actualChainId})`;
 
   if (isConnected) {
     return (
@@ -19,6 +29,54 @@ export function EthereumConnect() {
               {networkName}
             </span>
           </div>
+          {!isCorrectNetwork && (
+            <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none mt-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-yellow-400">
+                    ⚠️ Wrong Network
+                  </p>
+                  <p className="text-xs text-layerzero-gray-400 mt-1">
+                    Please switch to OP Sepolia to use EVM features
+                  </p>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (window?.ethereum) {
+                      try {
+                        await window.ethereum.request({
+                          method: 'wallet_switchEthereumChain',
+                          params: [{ chainId: '0xaa37dc' }],
+                        });
+                      } catch (switchError) {
+                        if (
+                          typeof switchError === 'object' &&
+                          switchError !== null &&
+                          'code' in switchError &&
+                          Number((switchError as Record<string, unknown>).code) === 4902
+                        ) {
+                          await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                              chainId: '0xaa37dc',
+                              chainName: 'OP Sepolia',
+                              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                              rpcUrls: ['https://sepolia.optimism.io'],
+                              blockExplorerUrls: ['https://optimism-sepolia.blockscout.com/'],
+                            }],
+                          });
+                        }
+                      }
+                    }
+                  }}
+                  className="lz-button text-xs py-2 px-3"
+                  type="button"
+                >
+                  Switch Network
+                </button>
+              </div>
+            </div>
+          )}
           <div className="text-sm text-white">
             <span className="font-medium text-layerzero-gray-400">Address:</span> {address}
           </div>

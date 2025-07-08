@@ -9,12 +9,16 @@ import {
 } from "./components/wallet";
 import { getNetworkName } from "./utils/network";
 import { useChainId } from "wagmi";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function AppContent() {
   const [showSwitchSuccess, setShowSwitchSuccess] = useState(false);
   const [networkSwitchCount, setNetworkSwitchCount] = useState(0);
+  const [chainChangedFlag, setChainChangedFlag] = useState(0);
   const chainId = useChainId();
+  // Use chainChangedFlag to force re-render on chain change
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _forceRerender = chainChangedFlag;
   // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
   let actualChainId: number | null = null;
   if (window?.ethereum?.chainId) {
@@ -27,6 +31,16 @@ function AppContent() {
   if (!actualChainId) actualChainId = chainId;
   const networkName = getNetworkName(actualChainId);
   const isWrongNetwork = actualChainId !== 11155420; // OP Sepolia chainId
+
+  // Listen for chainChanged event to force re-render
+  useEffect(() => {
+    if (!window?.ethereum) return;
+    const handler = () => setChainChangedFlag(f => f + 1);
+    window.ethereum.on('chainChanged', handler);
+    return () => {
+      window.ethereum.removeListener('chainChanged', handler);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-layerzero-black lz-grid-bg">
       {/* Header */}
@@ -45,7 +59,7 @@ function AppContent() {
 
       {/* Global Network Warning */}
       {isWrongNetwork && networkSwitchCount < 1 && (
-        <div className="w-full bg-yellow-900 border-b border-yellow-400 text-yellow-300 py-3 px-4 text-center font-medium">
+        <div className="fixed top-0 left-0 w-full bg-yellow-900 border-b border-yellow-400 text-yellow-300 py-3 px-4 text-center font-medium z-50" style={{zIndex: 1000}}>
           <span className="mr-2">⚠️</span>
           You are not connected to OP Sepolia.{' '}
           <button
