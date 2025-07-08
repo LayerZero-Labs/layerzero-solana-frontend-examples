@@ -10,7 +10,6 @@ export default function SolanaMintCard() {
     tokenMint,
     programId,
     oftStore,
-    fetchBalance,
     handleMint,
     isMintTokenInstructionAvailable,
     isChecking,
@@ -84,13 +83,6 @@ export default function SolanaMintCard() {
                     ? "Loading..."
                     : `${balance.uiAmount.toLocaleString()} OFT`}
                 </p>
-                <button
-                  onClick={fetchBalance}
-                  disabled={isLoadingBalance}
-                  className="lz-button text-xs py-2 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoadingBalance ? "Loading..." : "Refresh"}
-                </button>
               </div>
             </div>
 
