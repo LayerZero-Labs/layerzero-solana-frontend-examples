@@ -8,7 +8,7 @@ import {
   WagmiProviderWrapper 
 } from "./components/wallet";
 import { getNetworkName } from "./utils/network";
-import { useChainId } from "wagmi";
+import { useChainId, useAccount } from "wagmi";
 import { useState, useEffect } from 'react';
 
 function AppContent() {
@@ -16,21 +16,19 @@ function AppContent() {
   const [networkSwitchCount, setNetworkSwitchCount] = useState(0);
   const [chainChangedFlag, setChainChangedFlag] = useState(0);
   const chainId = useChainId();
-  // Use chainChangedFlag to force re-render on chain change
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _forceRerender = chainChangedFlag;
+  const { isConnected } = useAccount();
   // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
   let actualChainId: number | null = null;
-  if (window?.ethereum?.chainId) {
+  if (isConnected && window?.ethereum?.chainId) {
     try {
       actualChainId = parseInt(window.ethereum.chainId, 16);
     } catch {
       actualChainId = null;
     }
   }
-  if (!actualChainId) actualChainId = chainId;
+  if (!actualChainId) actualChainId = isConnected ? chainId : 11155420; // Default to OP Sepolia if not connected
   const networkName = getNetworkName(actualChainId);
-  const isWrongNetwork = actualChainId !== 11155420; // OP Sepolia chainId
+  const isWrongNetwork = isConnected && actualChainId !== 11155420; // Only show warning if wallet is connected and wrong network
 
   // Listen for chainChanged event to force re-render
   useEffect(() => {
@@ -43,6 +41,8 @@ function AppContent() {
   }, []);
   return (
     <div className="min-h-screen bg-layerzero-black lz-grid-bg">
+      {/* Hidden element to use chainChangedFlag and force re-render */}
+      <span style={{ display: 'none' }}>{chainChangedFlag}</span>
       {/* Header */}
       <header className="border-b border-layerzero-gray-900">
         <div className="container mx-auto px-8 py-6">

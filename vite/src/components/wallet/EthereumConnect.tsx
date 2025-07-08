@@ -9,14 +9,14 @@ export function EthereumConnect() {
 
   // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
   let actualChainId: number | null = null;
-  if (window?.ethereum?.chainId) {
+  if (isConnected && window?.ethereum?.chainId) {
     try {
       actualChainId = parseInt(window.ethereum.chainId, 16);
     } catch {
       actualChainId = null;
     }
   }
-  if (!actualChainId) actualChainId = chainId;
+  if (!actualChainId) actualChainId = isConnected ? chainId : 11155420; // Default to OP Sepolia if not connected
   const isCorrectNetwork = actualChainId === optimismSepolia.id;
   const networkName = isCorrectNetwork ? 'OP Sepolia' : `Wrong Network (Chain ID: ${actualChainId})`;
 
