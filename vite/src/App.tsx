@@ -21,7 +21,7 @@ function AppContent() {
         <div className="container mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="lz-protocol-text">
-              LayerZero Demo Application
+              LayerZero OFT Demo
             </div>
             <div className="lz-protocol-text">
               /// One OFT. 130+ Blockchains.
@@ -191,7 +191,7 @@ function AppContent() {
         <div className="container mx-auto px-8 py-12">
           <div className="flex justify-between items-center">
             <div className="lz-protocol-text">
-              Demo Application • LayerZero Protocol
+              Demo Application • LayerZero • Powering Crypto
             </div>
             <div className="lz-protocol-text">
               Not for Production Use
