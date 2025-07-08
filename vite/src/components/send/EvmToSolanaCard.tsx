@@ -128,10 +128,27 @@ export default function EvmToSolanaCard() {
       {isConfirmed && (
         <div className="space-y-4">
           <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
-            <p className="text-sm text-green-400">
+            <p className="text-sm text-green-400 flex items-start gap-2">
               <span className="font-medium">Transaction Hash:</span>
               {hash && (
-                <span className="font-mono text-xs ml-2">{hash}</span>
+                <span
+                  className="font-mono text-xs ml-2 break-all select-all bg-layerzero-gray-900 px-1 py-0.5 rounded cursor-pointer"
+                  title="Click to copy"
+                  onClick={() => {
+                    navigator.clipboard.writeText(hash);
+                  }}
+                >
+                  {hash}
+                </span>
+              )}
+              {hash && (
+                <button
+                  className="ml-2 px-2 py-0.5 text-xs bg-layerzero-gray-700 text-green-400 border border-green-400 rounded hover:bg-green-400 hover:text-layerzero-gray-900 transition-colors"
+                  onClick={() => navigator.clipboard.writeText(hash)}
+                  title="Copy hash to clipboard"
+                >
+                  Copy
+                </button>
               )}
             </p>
             {hash && (
