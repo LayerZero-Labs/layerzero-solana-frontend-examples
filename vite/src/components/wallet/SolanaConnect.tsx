@@ -38,6 +38,8 @@ export const SolanaConnect: FC = () => {
             }
             .wallet-adapter-button {
               display: inline-flex !important;
+              width: 100% !important;
+              justify-content: center !important;
               margin: 0 !important;
               background-color: #000000 !important;
               border: 1px solid #FFFFFF !important;
@@ -69,11 +71,10 @@ export const SolanaConnect: FC = () => {
                 {clusterName}
               </span>
             </div>
-            <div className="text-sm text-layerzero-gray-400">
-              <span className="font-medium">Address:</span> {publicKey?.toString()}
+            <div className="text-sm text-white">
+              <span className="font-medium text-layerzero-gray-400">Address:</span> {publicKey?.toString()}
             </div>
-            <div className="wallet-buttons-container flex items-center gap-4 flex-wrap">
-              <WalletMultiButton />
+            <div className="wallet-buttons-container">
               <WalletDisconnectButton />
             </div>
           </div>

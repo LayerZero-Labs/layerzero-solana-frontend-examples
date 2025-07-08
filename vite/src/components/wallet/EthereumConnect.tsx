@@ -13,14 +13,14 @@ export function EthereumConnect() {
   if (isConnected) {
     return (
       <div className="space-y-3">
-          <div className="text-sm text-layerzero-gray-400">
-            <span className="font-medium">Address:</span> {address}
-          </div>
           <div className="text-sm">
             <span className="font-medium text-layerzero-gray-400">Network:</span>{' '}
             <span className={`font-medium ${isCorrectNetwork ? 'text-green-400' : 'text-red-400'}`}>
               {networkName}
             </span>
+          </div>
+          <div className="text-sm text-white">
+            <span className="font-medium text-layerzero-gray-400">Address:</span> {address}
           </div>
           <button
             onClick={() => disconnect()}
