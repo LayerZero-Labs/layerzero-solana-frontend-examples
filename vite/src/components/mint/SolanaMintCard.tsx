@@ -12,6 +12,9 @@ export default function SolanaMintCard() {
     oftStore,
     fetchBalance,
     handleMint,
+    isMintTokenInstructionAvailable,
+    isChecking,
+    checkMintTokenExists,
   } = useSolanaOft();
 
   // ------------------------------------------------------------
@@ -25,6 +28,19 @@ export default function SolanaMintCard() {
     );
   }
 
+  // Show loading state while checking mintToken availability
+  if (wallet.connected && isMintTokenInstructionAvailable === null && isChecking) {
+    return (
+      <div className="space-y-4">
+        <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
+          <p className="text-sm text-layerzero-gray-400 text-center">
+            Checking program capabilities...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {error && (
@@ -32,6 +48,22 @@ export default function SolanaMintCard() {
           {error}
         </div>
       )}
+
+      {/* Show warning if mintToken is not available */}
+      {wallet.connected && isMintTokenInstructionAvailable === false && (
+        <div className="mb-4 p-3 bg-layerzero-gray-800 border border-yellow-400 text-yellow-400 rounded-none">
+          <p className="text-sm">
+            ⚠️ The mintToken method is not available on this program.
+          </p>
+          <button
+            onClick={checkMintTokenExists}
+            className="mt-2 text-xs underline hover:no-underline"
+          >
+            Recheck program capabilities
+          </button>
+        </div>
+      )}
+
         {/* Wallet-specific functionality */}
         {!wallet.connected ? (
           <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
@@ -66,14 +98,20 @@ export default function SolanaMintCard() {
             <div className="space-y-2">
               <button
                 onClick={handleMint}
-                disabled={isMinting}
+                disabled={isMinting || isMintTokenInstructionAvailable === false}
                 className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isMinting ? "Minting 1 OFT token..." : "Mint 1 OFT token"}
+                {isMinting 
+                  ? "Minting 1 OFT token..." 
+                  : isMintTokenInstructionAvailable === false
+                  ? "Mint function not available"
+                  : "Mint 1 OFT token"}
               </button>
 
               <p className="text-xs text-layerzero-gray-500 text-center">
-                Using the OFT Program's mock mint function (public)
+                {isMintTokenInstructionAvailable === false
+                  ? "The mintToken method is not supported by this program"
+                  : "Using the OFT Program's mock mint function (public)"}
               </p>
             </div>
           </>

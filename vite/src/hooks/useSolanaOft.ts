@@ -18,6 +18,7 @@ import type Oft from "../vm-artifacts/solana/idl/oft.json";
 
 // Import utilities
 import { useStableSolanaContractsWeb3, useWalletReady } from './utils';
+import { useCheckFreeMintInstructionExists } from './useCheckFreeMintInstructionExists';
 
 interface TokenBalance {
   amount: number;
@@ -48,6 +49,7 @@ export function useSolanaOft() {
   // Use utility hooks
   const walletReady = useWalletReady();
   const contractValues = useStableSolanaContractsWeb3();
+  const { isMintTokenInstructionAvailable, isChecking, checkMintTokenExists } = useCheckFreeMintInstructionExists();
 
   // ------------------------------------------------------------
   // Anchor helpers
@@ -161,6 +163,14 @@ export function useSolanaOft() {
       setError("Wallet not connected or contracts not initialised");
       return;
     }
+
+    // Check if mintToken method exists before proceeding
+    const mintTokenExists = await checkMintTokenExists();
+    if (!mintTokenExists) {
+      setError("mintToken method is not available on this program");
+      return;
+    }
+
     console.log('=== Minting ===');
 
     setIsMinting(true);
@@ -233,6 +243,7 @@ export function useSolanaOft() {
     createAssociatedTokenAccount,
     connection,
     fetchBalance,
+    checkMintTokenExists,
   ]);
 
   // ------------------------------------------------------------
@@ -259,5 +270,8 @@ export function useSolanaOft() {
     oftStore: contractValues.oftStore,
     fetchBalance,
     handleMint,
+    isMintTokenInstructionAvailable,
+    isChecking,
+    checkMintTokenExists,
   };
 } 
