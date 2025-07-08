@@ -70,7 +70,7 @@ export const SolanaConnect: FC = () => {
               </span>
             </div>
             <div className="text-sm text-layerzero-gray-400">
-              <span className="font-medium">Address:</span> {publicKey?.toString().slice(0, 6)}...{publicKey?.toString().slice(-4)}
+              <span className="font-medium">Address:</span> {publicKey?.toString()}
             </div>
             <div className="wallet-buttons-container flex items-center gap-4 flex-wrap">
               <WalletMultiButton />

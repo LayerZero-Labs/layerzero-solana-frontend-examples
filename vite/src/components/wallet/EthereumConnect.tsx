@@ -14,7 +14,7 @@ export function EthereumConnect() {
     return (
       <div className="space-y-3">
           <div className="text-sm text-layerzero-gray-400">
-            <span className="font-medium">Address:</span> {address?.slice(0, 6)}...{address?.slice(-4)}
+            <span className="font-medium">Address:</span> {address}
           </div>
           <div className="text-sm">
             <span className="font-medium text-layerzero-gray-400">Network:</span>{' '}
