@@ -19,13 +19,24 @@ export function useEvmBase(options: UseEvmBaseOptions = {}) {
     hash,
   })
 
+  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
+  let actualChainId: number | null = null;
+  if (window?.ethereum?.chainId) {
+    try {
+      actualChainId = parseInt(window.ethereum.chainId, 16);
+    } catch {
+      actualChainId = null;
+    }
+  }
+  if (!actualChainId) actualChainId = chainId;
+
   // Error state
   const [error, setError] = useState<string | null>(null)
 
   // Network checking based on options
   const isCorrectNetwork = networkCheck === 'optimism-sepolia' 
-    ? chainId === optimismSepolia.id
-    : isSupportedEvmChain(chainId)
+    ? actualChainId === optimismSepolia.id
+    : isSupportedEvmChain(actualChainId)
 
   // Network switching
   const handleSwitchNetwork = useCallback(() => {
@@ -55,7 +66,7 @@ export function useEvmBase(options: UseEvmBaseOptions = {}) {
     
     // Network state
     isCorrectNetwork,
-    chainId,
+    chainId: actualChainId,
     
     // Transaction state
     hash,

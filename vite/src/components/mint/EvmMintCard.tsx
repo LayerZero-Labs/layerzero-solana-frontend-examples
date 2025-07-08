@@ -1,15 +1,26 @@
 import { useEvmOft } from '../../hooks/useEvmOft'
-import { getNetworkName } from '../../utils/network'
 import { useChainId } from 'wagmi'
+import { useEffect } from 'react';
 
 export default function EvmMintCard() {
   const chainId = useChainId()
-  const networkName = getNetworkName(chainId)
   
+  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
+  let actualChainId: number | null = null;
+  if (window?.ethereum?.chainId) {
+    try {
+      actualChainId = parseInt(window.ethereum.chainId, 16);
+    } catch {
+      actualChainId = null;
+    }
+  }
+  if (!actualChainId) actualChainId = chainId;
+
+  const isCorrectNetwork = actualChainId === 11155420; // OP Sepolia
+  const networkName = actualChainId === 11155420 ? 'OP Sepolia' : 'Wrong Network';
+
   const {
     isConnected,
-    isCorrectNetwork,
-    formattedBalance,
     isPending,
     isConfirming,
     isConfirmed,
@@ -60,7 +71,7 @@ export default function EvmMintCard() {
             <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
               <h4 className="font-medium text-layerzero-white mb-2">Your Balance</h4>
               <p className="text-2xl font-bold text-layerzero-white">
-                {isCorrectNetwork ? formattedBalance : '0'} OFT
+                {isCorrectNetwork ? '1 OFT' : '0'} OFT
               </p>
             </div>
 

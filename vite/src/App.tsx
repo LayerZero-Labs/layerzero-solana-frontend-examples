@@ -9,11 +9,24 @@ import {
 } from "./components/wallet";
 import { getNetworkName } from "./utils/network";
 import { useChainId } from "wagmi";
+import { useState } from 'react';
 
 function AppContent() {
+  const [showSwitchSuccess, setShowSwitchSuccess] = useState(false);
+  const [networkSwitchCount, setNetworkSwitchCount] = useState(0);
   const chainId = useChainId();
-  const networkName = getNetworkName(chainId);
-
+  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
+  let actualChainId: number | null = null;
+  if (window?.ethereum?.chainId) {
+    try {
+      actualChainId = parseInt(window.ethereum.chainId, 16);
+    } catch {
+      actualChainId = null;
+    }
+  }
+  if (!actualChainId) actualChainId = chainId;
+  const networkName = getNetworkName(actualChainId);
+  const isWrongNetwork = actualChainId !== 11155420; // OP Sepolia chainId
   return (
     <div className="min-h-screen bg-layerzero-black lz-grid-bg">
       {/* Header */}
@@ -29,6 +42,64 @@ function AppContent() {
           </div>
         </div>
       </header>
+
+      {/* Global Network Warning */}
+      {isWrongNetwork && networkSwitchCount < 1 && (
+        <div className="w-full bg-yellow-900 border-b border-yellow-400 text-yellow-300 py-3 px-4 text-center font-medium">
+          <span className="mr-2">⚠️</span>
+          You are not connected to OP Sepolia.{' '}
+          <button
+            onClick={async () => {
+              if (window?.ethereum) {
+                try {
+                  await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0xaa37dc' }], // 0xaa37dc = 11155420
+                  });
+                  setShowSwitchSuccess(true);
+                  setTimeout(() => setShowSwitchSuccess(false), 3000);
+                  setNetworkSwitchCount((c) => c + 1);
+                } catch (switchError) {
+                  // handle error (e.g., user rejected, not added)
+                  if (
+                    typeof switchError === 'object' &&
+                    switchError !== null &&
+                    'code' in switchError &&
+                    Number((switchError as Record<string, unknown>).code) === 4902
+                  ) {
+                    // Chain not added to MetaMask
+                    await window.ethereum.request({
+                      method: 'wallet_addEthereumChain',
+                      params: [{
+                        chainId: '0xaa37dc',
+                        chainName: 'OP Sepolia',
+                        nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                        rpcUrls: ['https://sepolia.optimism.io'],
+                        blockExplorerUrls: ['https://optimism-sepolia.blockscout.com/'],
+                      }],
+                    });
+                    setShowSwitchSuccess(true);
+                    setTimeout(() => setShowSwitchSuccess(false), 3000);
+                    setNetworkSwitchCount((c) => c + 1);
+                  }
+                }
+              }
+            }}
+            className="underline text-yellow-200 hover:text-yellow-100 cursor-pointer bg-transparent border-none p-0 m-0 font-medium"
+            style={{ textDecoration: 'underline' }}
+            type="button"
+          >
+            Switch your EVM wallet to the OP Sepolia network
+          </button>
+          {' '}to use all features.
+        </div>
+      )}
+      {/* Toast for successful network switch */}
+      {showSwitchSuccess && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-700 text-white px-6 py-3 rounded shadow-lg z-50 font-medium">
+          Successfully switched to OP Sepolia!
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-8 py-20">
