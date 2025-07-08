@@ -1,11 +1,9 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useChainId, useAccount } from "wagmi";
 import { useState, useEffect, useCallback } from "react";
 
 // Import utilities
 import {
   useUmiWithWallet,
-  useWalletReady,
   useEndpointId,
   getNetworkName,
   useMultipleLoadingStates,
@@ -13,6 +11,7 @@ import {
   getOftQuote,
   sendOftTransaction,
   processLayerZeroError,
+  useSolanaBase,
 } from './utils';
 
 interface SendState {
@@ -22,12 +21,12 @@ interface SendState {
 }
 
 export function useSolanaToEvm() {
-  const wallet = useWallet();
+  const solanaBase = useSolanaBase();
+  const { wallet, walletReady } = solanaBase;
   const chainId = useChainId();
   const { address: ethereumAddress, isConnected: isEthereumConnected } = useAccount();
 
   // Use utility hooks
-  const walletReady = useWalletReady();
   const umiWithWallet = useUmiWithWallet();
   const toEid = useEndpointId(chainId);
   const contractValues = useStableSolanaContracts();

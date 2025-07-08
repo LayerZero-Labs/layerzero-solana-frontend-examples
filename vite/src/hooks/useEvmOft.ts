@@ -1,28 +1,17 @@
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
-import { useState, useEffect, useCallback } from 'react'
+import { useReadContract } from 'wagmi'
+import { useEffect, useCallback } from 'react'
 import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
 import { 
   formatTokenBalance, 
-  isSupportedEvmChain, 
-  getTargetEvmChain, 
   getEvmOftContracts, 
-  processEvmError, 
   getMintParameters 
 } from '../utils/oft'
+import { useEvmBase } from './utils'
 
 export function useEvmOft() {
-  const { address, isConnected } = useAccount()
-  const chainId = useChainId()
-  const { switchChain } = useSwitchChain()
-  const { writeContract, data: hash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  })
+  const evmBase = useEvmBase({ networkCheck: 'supported-chains' })
+  const { address, isConnected, isCorrectNetwork, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase
 
-  const [error, setError] = useState<string | null>(null)
-
-  // Network check
-  const isCorrectNetwork = isSupportedEvmChain(chainId)
   const contracts = getEvmOftContracts()
 
   // Read user's token balance
@@ -41,7 +30,7 @@ export function useEvmOft() {
   const handleMint = useCallback(async () => {
     if (!address || !isCorrectNetwork) return
 
-    setError(null)
+    evmBase.clearError()
     try {
       const mintParams = getMintParameters(address, '1')
       writeContract({
@@ -51,16 +40,9 @@ export function useEvmOft() {
         args: mintParams.args,
       })
     } catch (error) {
-      console.error('Error minting:', error)
-      setError(processEvmError(error))
+      handleError(error, 'Error minting')
     }
-  }, [address, isCorrectNetwork, writeContract])
-
-  // Handle network switching
-  const handleSwitchNetwork = useCallback(() => {
-    const targetChain = getTargetEvmChain()
-    switchChain({ chainId: targetChain.id })
-  }, [switchChain])
+  }, [address, isCorrectNetwork, writeContract, evmBase, handleError])
 
   // Refetch balance when transaction is confirmed
   useEffect(() => {

@@ -1,23 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { parseEther, formatEther } from 'viem'
-import { optimismSepolia } from 'wagmi/chains'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
 import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
 import { CONTRACTS } from '../config/contracts'
+import { useEvmBase } from './utils'
 
 const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
 export function useEvmToSolana() {
-  const { address, isConnected } = useAccount()
-  const chainId = useChainId()
-  const { switchChain } = useSwitchChain()
-  const { writeContract, data: hash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  })
+  const evmBase = useEvmBase({ networkCheck: 'optimism-sepolia' })
+  const { address, isConnected, isCorrectNetwork, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase
   const wallet = useWallet()
 
   // State management
@@ -25,10 +19,6 @@ export function useEvmToSolana() {
   const [recipientAddress, setRecipientAddress] = useState('')
   const [quoteFee, setQuoteFee] = useState<bigint | null>(null)
   const [isQuoting, setIsQuoting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  // Network check
-  const isCorrectNetwork = chainId === optimismSepolia.id
 
   // Auto-populate recipient address when Solana wallet connects
   useEffect(() => {
@@ -42,29 +32,25 @@ export function useEvmToSolana() {
     if (!amount || !recipientAddress) return
 
     setIsQuoting(true)
-    setError(null)
+    evmBase.clearError()
     try {
       // Use a mock fee for now - actual implementation would call quoteSend
       const mockFee = parseEther((parseFloat(amount) * 0.01).toString())
       setQuoteFee(mockFee)
     } catch (error) {
-      console.error('Error getting quote:', error)
-      setError('Failed to get quote')
+      handleError(error, 'Failed to get quote')
     } finally {
       setIsQuoting(false)
     }
-  }, [amount, recipientAddress])
+  }, [amount, recipientAddress, evmBase, handleError])
 
-  // Handle network switching
-  const handleSwitchNetwork = useCallback(() => {
-    switchChain({ chainId: optimismSepolia.id })
-  }, [switchChain])
+
 
   // Send tokens cross-chain
   const sendTokens = useCallback(async () => {
     if (!amount || !recipientAddress || !isCorrectNetwork) return
 
-    setError(null)
+    evmBase.clearError()
     try {
       let currentQuoteFee = quoteFee
       
@@ -77,8 +63,7 @@ export function useEvmToSolana() {
           setQuoteFee(mockFee)
           currentQuoteFee = mockFee
         } catch (quoteError) {
-          console.error('Error getting quote:', quoteError)
-          setError('Failed to get quote')
+          handleError(quoteError, 'Failed to get quote')
           return
         } finally {
           setIsQuoting(false)
@@ -111,10 +96,9 @@ export function useEvmToSolana() {
         value: currentQuoteFee,
       })
     } catch (error) {
-      console.error('Error sending tokens:', error)
-      setError('Failed to send tokens')
+      handleError(error, 'Failed to send tokens')
     }
-  }, [amount, recipientAddress, quoteFee, isCorrectNetwork, writeContract, address])
+  }, [amount, recipientAddress, quoteFee, isCorrectNetwork, writeContract, address, evmBase, handleError])
 
   // Format quote fee for display
   const formattedQuoteFee = quoteFee ? formatEther(quoteFee) : null

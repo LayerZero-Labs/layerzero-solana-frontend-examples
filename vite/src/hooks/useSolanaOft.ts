@@ -1,4 +1,4 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useConnection } from "@solana/wallet-adapter-react";
 import { useState, useEffect, useCallback } from "react";
 import {
   PublicKey,
@@ -17,7 +17,7 @@ import oftIdl from "../vm-artifacts/solana/idl/oft.json";
 import type Oft from "../vm-artifacts/solana/idl/oft.json";
 
 // Import utilities
-import { useStableSolanaContractsWeb3, useWalletReady } from './utils';
+import { useStableSolanaContractsWeb3, useSolanaBase } from './utils';
 import { useCheckFreeMintInstructionExists } from './useCheckFreeMintInstructionExists';
 
 interface TokenBalance {
@@ -35,7 +35,8 @@ interface AnchorError {
 
 // Custom hook for Solana OFT logic
 export function useSolanaOft() {
-  const wallet = useWallet();
+  const solanaBase = useSolanaBase();
+  const { wallet, walletReady, error, handleError, clearError } = solanaBase;
   const { connection } = useConnection();
   const [isMinting, setIsMinting] = useState(false);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
@@ -44,10 +45,8 @@ export function useSolanaOft() {
     decimals: 6,
     uiAmount: 0,
   });
-  const [error, setError] = useState<string | null>(null);
 
   // Use utility hooks
-  const walletReady = useWalletReady();
   const contractValues = useStableSolanaContractsWeb3();
   const { isMintTokenInstructionAvailable, isChecking, checkMintTokenExists } = useCheckFreeMintInstructionExists();
 
@@ -90,10 +89,11 @@ export function useSolanaOft() {
     if (!walletReady.isReady || !contractValues.tokenMint) return;
 
     setIsLoadingBalance(true);
-    setError(null);
+    clearError();
 
     try {
-      const ata = await getAssociatedTokenAddress(contractValues.tokenMint, wallet.publicKey!);
+      const pubkey = new PublicKey(walletReady.publicKey!);
+      const ata = await getAssociatedTokenAddress(contractValues.tokenMint, pubkey);
       const account = await getAccount(connection, ata);
 
       const mintInfo = await connection.getParsedAccountInfo(contractValues.tokenMint);
@@ -111,13 +111,12 @@ export function useSolanaOft() {
       if (err instanceof TokenAccountNotFoundError) {
         setBalance({ amount: 0, decimals: 6, uiAmount: 0 });
       } else {
-        console.error(err);
-        setError("Failed to fetch token balance");
+        handleError(err, "Failed to fetch token balance");
       }
     } finally {
       setIsLoadingBalance(false);
     }
-  }, [connection, contractValues.tokenMint, walletReady.isReady, wallet.publicKey]);
+  }, [connection, contractValues.tokenMint, walletReady.isReady, walletReady.publicKey, handleError, clearError]);
 
   // ------------------------------------------------------------
   // Associated Token Account
@@ -160,21 +159,21 @@ export function useSolanaOft() {
   // ------------------------------------------------------------
   const handleMint = useCallback(async () => {
     if (!walletReady.isReady || !contractValues.tokenMint || !contractValues.programId || !contractValues.oftStore) {
-      setError("Wallet not connected or contracts not initialised");
+      handleError(new Error("Wallet not connected or contracts not initialised"), "Wallet not connected or contracts not initialised");
       return;
     }
 
     // Check if mintToken method exists before proceeding
     const mintTokenExists = await checkMintTokenExists();
     if (!mintTokenExists) {
-      setError("mintToken method is not available on this program");
+      handleError(new Error("mintToken method is not available on this program"), "mintToken method is not available on this program");
       return;
     }
 
     console.log('=== Minting ===');
 
     setIsMinting(true);
-    setError(null);
+    clearError();
 
     try {
       const provider = getProvider();
@@ -224,11 +223,10 @@ export function useSolanaOft() {
       await connection.confirmTransaction(signature, "confirmed");
       await fetchBalance();
     } catch (err) {
-      console.error("Error minting", err);
       const anchorError = err as AnchorError;
       const msg =
         anchorError?.error?.errorMessage ?? anchorError?.message ?? "Failed to mint OFT tokens";
-      setError(msg);
+      handleError(err, msg);
     } finally {
       setIsMinting(false);
     }
@@ -244,6 +242,8 @@ export function useSolanaOft() {
     connection,
     fetchBalance,
     checkMintTokenExists,
+    handleError,
+    clearError,
   ]);
 
   // ------------------------------------------------------------
@@ -255,9 +255,9 @@ export function useSolanaOft() {
     } else {
       // Reset state when wallet disconnects
       setBalance({ amount: 0, decimals: 6, uiAmount: 0 });
-      setError(null);
+      clearError();
     }
-  }, [walletReady.isReady, fetchBalance]);
+  }, [walletReady.isReady, fetchBalance, clearError]);
 
   return {
     wallet,
