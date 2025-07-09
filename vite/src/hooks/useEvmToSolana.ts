@@ -4,12 +4,10 @@ import { parseEther, formatEther, toHex } from 'viem'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
 import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
-import { CONTRACTS } from '../config/contracts'
+import { oftAddress } from './useEvmOft'
 import { useEvmBase } from './utils'
 import { readContract } from 'wagmi/actions'
 import { wagmiConfig } from '../config/wagmi'
-
-const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
 export function useEvmToSolana() {
   const evmBase = useEvmBase({ networkCheck: 'optimism-sepolia' })
@@ -48,7 +46,7 @@ export function useEvmToSolana() {
         oftCmd: '0x' as string as `0x${string}`,
       }
       const msgFee = await readContract(wagmiConfig, {
-        address: SEPOLIA_OFT_ADDRESS,
+        address: oftAddress,
         abi: myOftMockAbi,
         functionName: 'quoteSend',
         args: [sendParam, false],
@@ -87,7 +85,7 @@ export function useEvmToSolana() {
             oftCmd: '0x' as string as `0x${string}`,
           }
           const msgFee = await readContract(wagmiConfig, {
-            address: SEPOLIA_OFT_ADDRESS,
+            address: oftAddress,
             abi: myOftMockAbi,
             functionName: 'quoteSend',
             args: [sendParam, false],
@@ -121,7 +119,7 @@ export function useEvmToSolana() {
       }
 
       writeContract({
-        address: SEPOLIA_OFT_ADDRESS,
+        address: oftAddress,
         abi: myOftMockAbi,
         functionName: 'send',
         args: [sendParam, messagingFee, address as `0x${string}`],

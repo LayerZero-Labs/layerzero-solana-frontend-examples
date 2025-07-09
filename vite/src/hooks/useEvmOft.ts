@@ -8,6 +8,9 @@ import {
 } from '../utils/oft'
 import { useEvmBase } from './utils'
 
+// Network-agnostic OFT address export
+export const oftAddress = getEvmOftContracts().sepoliaOft;
+
 export function useEvmOft() {
   const evmBase = useEvmBase({ networkCheck: 'supported-chains' })
   const { address, isConnected, isCorrectNetwork, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase

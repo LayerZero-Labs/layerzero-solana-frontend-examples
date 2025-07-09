@@ -51,7 +51,7 @@ export function useSolanaToEvm() {
     if (isEthereumConnected && ethereumAddress && !recipientAddress) {
       setRecipientAddress(ethereumAddress);
     }
-  }, [isEthereumConnected, ethereumAddress]);
+  }, [isEthereumConnected, ethereumAddress, recipientAddress]);
 
   const onClickQuote = useCallback(async () => {
     if (!walletReady.isReady || !umiWithWallet) {
