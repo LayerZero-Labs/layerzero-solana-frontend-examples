@@ -1,5 +1,11 @@
-Minimal setups to demonstrate how to use the `@layerzerolabs/oft-v2-solana-sdk` package in a frontend repo.
+## LayerZero Solana Frontend Example
 
-Note that currently, examples only incorporate `oft.quote` as a way to demonstrate the minimal viable configuration in order to make importing of `@layerzerolabs/oft-v2-solana-sdk` work for the particular setup.
+Minimal setups to demonstrate how to use the [`@layerzerolabs/oft-v2-solana-sdk`](https://www.npmjs.com/package/@layerzerolabs/oft-v2-solana-sdk) package in a frontend repo.
 
-The Vite example is prioritized for completeness while the others exist to show the minimum viable setup.
+This repo contains three examples:
+- next
+- next-reown
+- vite
+
+The [`./vite`](./vite) example is currently the most complete while the others exist to demonstrate the minimal configuration needed to use the Solana OFT SDK.
+
