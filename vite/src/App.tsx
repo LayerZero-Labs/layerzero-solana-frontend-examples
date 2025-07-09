@@ -19,7 +19,7 @@ function AppContent() {
   const { isConnected } = useAccount();
   // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
   let actualChainId: number | null = null;
-  if (isConnected && window?.ethereum?.chainId) {
+  if (typeof window !== "undefined" && window.ethereum && typeof window.ethereum.chainId === "string") {
     try {
       actualChainId = parseInt(window.ethereum.chainId, 16);
     } catch {
@@ -110,7 +110,7 @@ function AppContent() {
       )}
       {/* Toast for successful network switch */}
       {showSwitchSuccess && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-700 text-white px-6 py-3 rounded shadow-lg z-50 font-medium">
+        <div className="fixed top-4 right-4 bg-green-700 text-white px-6 py-3 rounded shadow-lg z-50 font-medium">
           Successfully switched to OP Sepolia!
         </div>
       )}
