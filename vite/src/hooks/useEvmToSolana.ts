@@ -6,6 +6,8 @@ import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
 import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
 import { CONTRACTS } from '../config/contracts'
 import { useEvmBase } from './utils'
+import { readContract } from 'wagmi/actions'
+import { wagmiConfig } from '../config/wagmi'
 
 const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
@@ -45,28 +47,11 @@ export function useEvmToSolana() {
         composeMsg: '0x' as string as `0x${string}`,
         oftCmd: '0x' as string as `0x${string}`,
       }
-      // Call quoteSend as a view function
-      const eth = window.ethereum as { request: (args: { method: string; params: unknown[] }) => Promise<string> }
-      const result = await eth.request({
-        method: 'eth_call',
-        params: [
-          {
-            to: SEPOLIA_OFT_ADDRESS,
-            data: (await import('viem')).encodeFunctionData({
-              abi: myOftMockAbi,
-              functionName: 'quoteSend',
-              args: [sendParam, false],
-            }),
-          },
-          'latest',
-        ],
-      }) as string
-      // Decode the result
-      const { decodeFunctionResult } = await import('viem')
-      const msgFee = decodeFunctionResult({
+      const msgFee = await readContract(wagmiConfig, {
+        address: SEPOLIA_OFT_ADDRESS,
         abi: myOftMockAbi,
         functionName: 'quoteSend',
-        data: result,
+        args: [sendParam, false],
       }) as { nativeFee: bigint; lzTokenFee: bigint }
       setQuoteFee(BigInt(msgFee.nativeFee))
     } catch (error) {
@@ -92,36 +77,20 @@ export function useEvmToSolana() {
         try {
           const recipientBytes32 = addressToBytes32(recipientAddress)
           const amountLD = parseEther(amount)
-          const emptyHex = toHex(new Uint8Array()) as `0x${string}`;
           const sendParam = {
             dstEid: EndpointId.SOLANA_V2_TESTNET,
-            to: toHex(recipientBytes32, { size: 32 }) as string as `0x${string}`,
+            to: toHex(recipientBytes32, { size: 32 }) as `0x${string}`,
             amountLD,
             minAmountLD: amountLD,
-            extraOptions: emptyHex,
-            composeMsg: emptyHex,
-            oftCmd: emptyHex,
+            extraOptions: '0x' as string as `0x${string}`,
+            composeMsg: '0x' as string as `0x${string}`,
+            oftCmd: '0x' as string as `0x${string}`,
           }
-          const eth = window.ethereum as { request: (args: { method: string; params: unknown[] }) => Promise<string> }
-          const result = await eth.request({
-            method: 'eth_call',
-            params: [
-              {
-                to: SEPOLIA_OFT_ADDRESS,
-                data: (await import('viem')).encodeFunctionData({
-                  abi: myOftMockAbi,
-                  functionName: 'quoteSend',
-                  args: [sendParam, false],
-                }),
-              },
-              'latest',
-            ],
-          }) as string
-          const { decodeFunctionResult } = await import('viem')
-          const msgFee = decodeFunctionResult({
+          const msgFee = await readContract(wagmiConfig, {
+            address: SEPOLIA_OFT_ADDRESS,
             abi: myOftMockAbi,
             functionName: 'quoteSend',
-            data: result,
+            args: [sendParam, false],
           }) as { nativeFee: bigint; lzTokenFee: bigint }
           setQuoteFee(BigInt(msgFee.nativeFee))
           currentQuoteFee = BigInt(msgFee.nativeFee)
