@@ -39,26 +39,26 @@ export function getTargetEvmChain() {
 /**
  * Format token balance for display
  */
-export function formatTokenBalance(balance: bigint | undefined): string {
+export function formatEvmTokenBalance(balance: bigint | undefined): string {
   return balance ? formatEther(balance) : '0';
 }
 
 /**
  * Parse token amount from string input
  */
-export function parseTokenAmount(amount: string): bigint {
+export function parseEvmTokenAmount(amount: string): bigint {
   return parseEther(amount);
 }
 
 /**
  * Get mint parameters for OFT tokens
  */
-export function getMintParameters(recipientAddress: string, amount: string = '1') {
+export function getEvmMintParameters(recipientAddress: string, amount: string = '1') {
   const contracts = getEvmOftContracts();
   return {
     address: contracts.sepoliaOft,
     functionName: 'mint' as const,
-    args: [recipientAddress as `0x${string}`, parseTokenAmount(amount)] as const,
+    args: [recipientAddress as `0x${string}`, parseEvmTokenAmount(amount)] as const,
   };
 }
 
@@ -99,7 +99,7 @@ export function processEvmError(error: unknown): string {
 /**
  * Validate token amount input
  */
-export function validateTokenAmount(amount: string): { isValid: boolean; error?: string } {
+export function validateEvmTokenAmount(amount: string): { isValid: boolean; error?: string } {
   if (!amount || amount.trim() === '') {
     return { isValid: false, error: 'Amount is required' };
   }
@@ -123,14 +123,14 @@ export function validateTokenAmount(amount: string): { isValid: boolean; error?:
 /**
  * Get transaction confirmation timeout (in milliseconds)
  */
-export function getTransactionTimeout(): number {
+export function getEvmTransactionTimeout(): number {
   return 60000; // 60 seconds
 }
 
 /**
  * Format transaction hash for display
  */
-export function formatTransactionHash(hash: string, length: number = 10): string {
+export function formatEvmTransactionHash(hash: string, length: number = 10): string {
   if (!hash) return '';
   return `${hash.slice(0, length)}...${hash.slice(-6)}`;
 }

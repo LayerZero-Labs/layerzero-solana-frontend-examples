@@ -2,9 +2,9 @@ import { useReadContract } from 'wagmi'
 import { useEffect, useCallback } from 'react'
 import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
 import { 
-  formatTokenBalance, 
+  formatEvmTokenBalance, 
   getEvmOftContracts, 
-  getMintParameters 
+  getEvmMintParameters 
 } from '../utils/oft'
 import { useEvmBase } from './utils'
 
@@ -27,7 +27,7 @@ export function useEvmOft() {
   })
 
   // Format balance for display
-  const formattedBalance = formatTokenBalance(balance)
+  const formattedBalance = formatEvmTokenBalance(balance)
 
   // Handle mint operation
   const handleMint = useCallback(async () => {
@@ -35,7 +35,7 @@ export function useEvmOft() {
 
     evmBase.clearError()
     try {
-      const mintParams = getMintParameters(address, '1')
+      const mintParams = getEvmMintParameters(address, '1')
       writeContract({
         address: mintParams.address,
         abi: myOftMockAbi,
