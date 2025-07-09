@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { parseEther, formatEther } from 'viem'
+import { parseEther, formatEther, toHex } from 'viem'
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
 import { myOftMockAbi } from '../vm-artifacts/evm/MyOFTMock'
@@ -34,9 +34,41 @@ export function useEvmToSolana() {
     setIsQuoting(true)
     evmBase.clearError()
     try {
-      // Use a mock fee for now - actual implementation would call quoteSend
-      const mockFee = parseEther((parseFloat(amount) * 0.01).toString())
-      setQuoteFee(mockFee)
+      const recipientBytes32 = addressToBytes32(recipientAddress)
+      const amountLD = parseEther(amount)
+      const sendParam = {
+        dstEid: EndpointId.SOLANA_V2_TESTNET,
+        to: toHex(recipientBytes32, { size: 32 }) as `0x${string}`,
+        amountLD,
+        minAmountLD: amountLD,
+        extraOptions: '0x' as string as `0x${string}`,
+        composeMsg: '0x' as string as `0x${string}`,
+        oftCmd: '0x' as string as `0x${string}`,
+      }
+      // Call quoteSend as a view function
+      const eth = window.ethereum as { request: (args: { method: string; params: unknown[] }) => Promise<string> }
+      const result = await eth.request({
+        method: 'eth_call',
+        params: [
+          {
+            to: SEPOLIA_OFT_ADDRESS,
+            data: (await import('viem')).encodeFunctionData({
+              abi: myOftMockAbi,
+              functionName: 'quoteSend',
+              args: [sendParam, false],
+            }),
+          },
+          'latest',
+        ],
+      }) as string
+      // Decode the result
+      const { decodeFunctionResult } = await import('viem')
+      const msgFee = decodeFunctionResult({
+        abi: myOftMockAbi,
+        functionName: 'quoteSend',
+        data: result,
+      }) as { nativeFee: bigint; lzTokenFee: bigint }
+      setQuoteFee(BigInt(msgFee.nativeFee))
     } catch (error) {
       handleError(error, 'Failed to get quote')
     } finally {
@@ -58,10 +90,41 @@ export function useEvmToSolana() {
       if (!currentQuoteFee) {
         setIsQuoting(true)
         try {
-          // Use a mock fee for now - actual implementation would call quoteSend
-          const mockFee = parseEther((parseFloat(amount) * 0.01).toString())
-          setQuoteFee(mockFee)
-          currentQuoteFee = mockFee
+          const recipientBytes32 = addressToBytes32(recipientAddress)
+          const amountLD = parseEther(amount)
+          const emptyHex = toHex(new Uint8Array()) as `0x${string}`;
+          const sendParam = {
+            dstEid: EndpointId.SOLANA_V2_TESTNET,
+            to: toHex(recipientBytes32, { size: 32 }) as string as `0x${string}`,
+            amountLD,
+            minAmountLD: amountLD,
+            extraOptions: emptyHex,
+            composeMsg: emptyHex,
+            oftCmd: emptyHex,
+          }
+          const eth = window.ethereum as { request: (args: { method: string; params: unknown[] }) => Promise<string> }
+          const result = await eth.request({
+            method: 'eth_call',
+            params: [
+              {
+                to: SEPOLIA_OFT_ADDRESS,
+                data: (await import('viem')).encodeFunctionData({
+                  abi: myOftMockAbi,
+                  functionName: 'quoteSend',
+                  args: [sendParam, false],
+                }),
+              },
+              'latest',
+            ],
+          }) as string
+          const { decodeFunctionResult } = await import('viem')
+          const msgFee = decodeFunctionResult({
+            abi: myOftMockAbi,
+            functionName: 'quoteSend',
+            data: result,
+          }) as { nativeFee: bigint; lzTokenFee: bigint }
+          setQuoteFee(BigInt(msgFee.nativeFee))
+          currentQuoteFee = BigInt(msgFee.nativeFee)
         } catch (quoteError) {
           handleError(quoteError, 'Failed to get quote')
           return
@@ -75,12 +138,12 @@ export function useEvmToSolana() {
       
       const sendParam = {
         dstEid: EndpointId.SOLANA_V2_TESTNET,
-        to: `0x${Buffer.from(recipientBytes32).toString('hex')}` as `0x${string}`,
+        to: toHex(recipientBytes32, { size: 32 }) as string as `0x${string}`,
         amountLD,
         minAmountLD: amountLD,
-        extraOptions: '0x' as `0x${string}`,
-        composeMsg: '0x' as `0x${string}`,
-        oftCmd: '0x' as `0x${string}`,
+        extraOptions: '0x' as string as `0x${string}`,
+        composeMsg: '0x' as string as `0x${string}`,
+        oftCmd: '0x' as string as `0x${string}`,
       }
 
       const messagingFee = {
