@@ -8,9 +8,9 @@ import {
   getNetworkName,
   useMultipleLoadingStates,
   useStableSolanaContracts,
-  getOftQuote,
-  sendOftTransaction,
-  processLayerZeroError,
+  getSolanaOftQuote,
+  sendSolanaOftTransaction,
+  processSolanaLayerZeroError,
   useSolanaBase,
 } from './utils';
 
@@ -70,7 +70,7 @@ export function useSolanaToEvm() {
       console.log("Using EndpointId:", toEid, "for chainId:", chainId);
       console.log("Destination address:", recipientAddress);
 
-      return await getOftQuote({
+      return await getSolanaOftQuote({
         umi: umiWithWallet,
         contractValues,
         walletPublicKey: walletReady.publicKey!,
@@ -121,7 +121,7 @@ export function useSolanaToEvm() {
           console.log("Using EndpointId:", toEid, "for chainId:", chainId);
           console.log("Destination address:", recipientAddress);
 
-          return await getOftQuote({
+          return await getSolanaOftQuote({
             umi: umiWithWallet,
             contractValues,
             walletPublicKey: walletReady.publicKey!,
@@ -144,7 +144,7 @@ export function useSolanaToEvm() {
         }
       }
 
-      const signature = await sendOftTransaction({
+      const signature = await sendSolanaOftTransaction({
         umi: umiWithWallet,
         contractValues,
         walletPublicKey: walletReady.publicKey!,
@@ -160,7 +160,7 @@ export function useSolanaToEvm() {
 
     } catch (error) {
       console.error("Cross-chain OFT send failed:", error);
-      const errorMessage = processLayerZeroError(error);
+      const errorMessage = processSolanaLayerZeroError(error);
       setSendState({ 
         isLoading: false, 
         txHash: null, 

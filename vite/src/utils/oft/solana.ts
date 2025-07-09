@@ -44,7 +44,7 @@ interface TransactionSetup {
 /**
  * Get a quote for sending OFT tokens cross-chain
  */
-export async function getOftQuote(params: QuoteParams): Promise<bigint> {
+export async function getSolanaOftQuote(params: QuoteParams): Promise<bigint> {
   const { umi, contractValues, walletPublicKey, recipientAddress, amount, toEid } = params;
 
   console.log("📊 Network request 1: fetchOFTStore");
@@ -87,7 +87,7 @@ export async function getOftQuote(params: QuoteParams): Promise<bigint> {
 /**
  * Setup transaction accounts and validate balances
  */
-export async function setupOftTransaction(params: SendTransactionParams): Promise<TransactionSetup> {
+export async function setupSolanaOftTransaction(params: SendTransactionParams): Promise<TransactionSetup> {
   const { umi, contractValues, walletPublicKey, recipientAddress, amount } = params;
 
   // Fetch OFT store information
@@ -138,7 +138,7 @@ export async function setupOftTransaction(params: SendTransactionParams): Promis
 /**
  * Create compute budget instructions for LayerZero transactions
  */
-export function createComputeBudgetInstructions(umi: Umi) {
+export function createSolanaComputeBudgetInstructions(umi: Umi) {
   // Following the LayerZero script approach for compute units
   const computeUnitLimitScaleFactor = 1.1; // Safety margin
   const computeUnitPriceScaleFactor = 2.0; // Higher priority for cross-chain
@@ -175,13 +175,13 @@ export function createComputeBudgetInstructions(umi: Umi) {
 /**
  * Send OFT tokens cross-chain
  */
-export async function sendOftTransaction(params: SendTransactionParams): Promise<string> {
+export async function sendSolanaOftTransaction(params: SendTransactionParams): Promise<string> {
   const { umi, contractValues, toEid, nativeFee } = params;
 
   console.log("Starting send transaction...");
 
   // Setup transaction accounts and validate
-  const setup = await setupOftTransaction(params);
+  const setup = await setupSolanaOftTransaction(params);
   const { mintPk, escrowPk, tokenAccount, amountUnits, recipientAddressBytes32 } = setup;
 
   console.log("Sending cross-chain OFT transaction...");
@@ -241,7 +241,7 @@ export async function sendOftTransaction(params: SendTransactionParams): Promise
 
   // Build transaction with compute budget
   console.log("Building LayerZero cross-chain transaction with compute budget...");
-  const { setComputeUnitPriceIx, setComputeUnitLimitIx } = createComputeBudgetInstructions(umi);
+  const { setComputeUnitPriceIx, setComputeUnitLimitIx } = createSolanaComputeBudgetInstructions(umi);
 
   // Build transaction following LayerZero pattern
   const txB = transactionBuilder()
@@ -262,17 +262,16 @@ export async function sendOftTransaction(params: SendTransactionParams): Promise
 /**
  * Process LayerZero-specific error messages
  */
-export function processLayerZeroError(error: unknown): string {
+export function processSolanaLayerZeroError(error: unknown): string {
   let errorMessage = "Unknown error occurred";
   
   if (error instanceof Error) {
     errorMessage = error.message;
     
-    // Provide specific guidance for common LayerZero errors
     if (errorMessage.includes("InsufficientFee")) {
-      errorMessage = "Insufficient fee error. This may be due to fee fluctuations or high network congestion. Try again or increase your SOL balance.";
+      errorMessage = "Insufficient fee error. Are you calling 'quoteSend' correctly?";
     } else if (errorMessage.includes("exceeded CUs meter") || errorMessage.includes("compute units")) {
-      errorMessage = "Transaction exceeded compute unit limit. LayerZero cross-chain transactions require high compute units. You may need to use a wallet that supports custom compute unit limits or try during less congested periods.";
+      errorMessage = "Transaction exceeded compute unit limit. ";
     }
   }
   
