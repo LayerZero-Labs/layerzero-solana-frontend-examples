@@ -12,7 +12,7 @@ import { useEvmBase } from './utils'
 export const oftAddress = getEvmOftContracts().sepoliaOft;
 
 export function useEvmOft() {
-  const evmBase = useEvmBase({ networkCheck: 'supported-chains' })
+  const evmBase = useEvmBase()
   const { address, isConnected, isCorrectNetwork, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase
 
   const contracts = getEvmOftContracts()
