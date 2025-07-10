@@ -10,8 +10,8 @@ import { readContract } from 'wagmi/actions'
 import { wagmiConfig } from '../config/wagmi'
 
 export function useEvmToSolana() {
-  const evmBase = useEvmBase({ networkCheck: 'optimism-sepolia' })
-  const { address, isConnected, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase
+  const evmBase = useEvmBase()
+  const { address, isConnected, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError, isCorrectNetwork } = evmBase
   const wallet = useWallet()
 
   // State management
