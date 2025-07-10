@@ -23,13 +23,6 @@ export function getEvmOftContracts() {
 }
 
 /**
- * Check if the current chain is supported for EVM OFT operations
- */
-export function isSupportedEvmChain(chainId: number): boolean {
-  return chainId === EVM_CHAINS.OPTIMISM_SEPOLIA.id;
-}
-
-/**
  * Get the target chain for EVM OFT operations (default: OP Sepolia)
  */
 export function getTargetEvmChain() {

@@ -1,23 +1,6 @@
 import { useEvmOft } from '../../hooks/useEvmOft'
-import { useChainId } from 'wagmi'
 
-export default function EvmMintCard() {
-  const chainId = useChainId()
-  
-  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
-  let actualChainId: number | null = null;
-  if (window?.ethereum?.chainId) {
-    try {
-      actualChainId = parseInt(window.ethereum.chainId, 16);
-    } catch {
-      actualChainId = null;
-    }
-  }
-  if (!actualChainId) actualChainId = chainId;
-
-  const isCorrectNetwork = actualChainId === 11155420; // OP Sepolia
-  const networkName = actualChainId === 11155420 ? 'OP Sepolia' : 'Wrong Network';
-
+export default function EvmMintCard({ networkName, isWrongNetwork }: { networkName: string, isWrongNetwork: boolean }) {
   const {
     isConnected,
     isPending,
@@ -26,6 +9,7 @@ export default function EvmMintCard() {
     error,
     handleMint,
     handleSwitchNetwork,
+    formattedBalance,
   } = useEvmOft()
 
   return (
@@ -45,7 +29,7 @@ export default function EvmMintCard() {
         ) : (
           <>
             {/* Network check - Only when wallet connected */}
-            {!isCorrectNetwork && (
+            {isWrongNetwork && (
               <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
                 <div className="flex items-center justify-between">
                   <div>
@@ -53,7 +37,7 @@ export default function EvmMintCard() {
                       Wrong Network
                     </p>
                     <p className="text-xs text-layerzero-gray-400 mt-1">
-                      Please switch to OP Sepolia to use OFT features
+                      Please switch to {networkName} to use OFT features
                     </p>
                   </div>
                   <button
@@ -70,23 +54,23 @@ export default function EvmMintCard() {
             <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
               <h4 className="font-medium text-layerzero-white mb-2">Your Balance</h4>
               <p className="text-2xl font-bold text-layerzero-white">
-                {isCorrectNetwork ? '1 OFT' : '0'} OFT
+                {!isWrongNetwork ? formattedBalance : '0'} OFT
               </p>
             </div>
 
             {/* Mint functionality - Only when wallet connected */}
             <button
               onClick={handleMint}
-              disabled={!isCorrectNetwork || isPending || isConfirming}
+              disabled={isWrongNetwork || isPending || isConfirming}
               className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
+              {isWrongNetwork ? `Switch to ${networkName}` : 
                isPending ? 'Confirming...' : 
                isConfirming ? 'Minting...' : 
                'Mint 1 OFT token'}
             </button>
 
-            {isConfirmed && isCorrectNetwork && (
+            {isConfirmed && !isWrongNetwork && (
               <div className="p-3 bg-layerzero-gray-800 border border-green-400 rounded-none">
                 <p className="text-sm text-green-400">
                   ✅ Successfully minted 1 OFT token!

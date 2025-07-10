@@ -1,15 +1,13 @@
 import { useState, useCallback } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
 import { optimismSepolia } from 'wagmi/chains'
-import { isSupportedEvmChain, getTargetEvmChain, processEvmError } from '../../utils/oft'
+import { processEvmError } from '../../utils/oft'
 
-interface UseEvmBaseOptions {
-  networkCheck?: 'optimism-sepolia' | 'supported-chains'
-}
+// Hardcoded supported EVM networks (global, app-wide)
+const supportedEvmNetworks = [optimismSepolia];
+const singleSupportedNetwork = supportedEvmNetworks[0];
 
-export function useEvmBase(options: UseEvmBaseOptions = {}) {
-  const { networkCheck = 'supported-chains' } = options
-  
+export function useEvmBase() {
   // Wagmi hooks
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
@@ -28,24 +26,29 @@ export function useEvmBase(options: UseEvmBaseOptions = {}) {
       actualChainId = null;
     }
   }
-  if (!actualChainId) actualChainId = chainId;
+  if (!actualChainId) actualChainId = isConnected ? chainId : optimismSepolia.id;
+
+  // Find out if your current chain is one you support
+  const isSupported = supportedEvmNetworks.some(net => net.id === actualChainId);
+
+  // Flag “wrong network” when connected but not in that list
+  const isWrongNetwork = isConnected && !isSupported;
+
+  // go from actualChainId to network
+  const network = supportedEvmNetworks.find(n => n.id === actualChainId);
+  const networkName = network?.name ?? singleSupportedNetwork.name;
 
   // Error state
   const [error, setError] = useState<string | null>(null)
 
-  // Network checking based on options
-  const isCorrectNetwork = networkCheck === 'optimism-sepolia' 
-    ? actualChainId === optimismSepolia.id
-    : isSupportedEvmChain(actualChainId)
+  // Network is correct if it's in the supported list
+  const isCorrectNetwork = isSupported;
 
-  // Network switching
+  // Network switching (always to the first supported network)
   const handleSwitchNetwork = useCallback(() => {
-    const targetChainId = networkCheck === 'optimism-sepolia' 
-      ? optimismSepolia.id
-      : getTargetEvmChain().id
-    
+    const targetChainId = singleSupportedNetwork.id;
     switchChain({ chainId: targetChainId })
-  }, [switchChain, networkCheck])
+  }, [switchChain])
 
   // Common error handling
   const handleError = useCallback((error: unknown, fallbackMessage: string) => {
@@ -67,6 +70,12 @@ export function useEvmBase(options: UseEvmBaseOptions = {}) {
     // Network state
     isCorrectNetwork,
     chainId: actualChainId,
+    isSupported,
+    isWrongNetwork,
+    network,
+    networkName,
+    supportedEvmNetworks,
+    singleSupportedNetwork,
     
     // Transaction state
     hash,

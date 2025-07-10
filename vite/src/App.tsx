@@ -7,28 +7,21 @@ import {
   EthereumConnect, 
   WagmiProviderWrapper 
 } from "./components/wallet";
-import { getNetworkName } from "./utils/network";
-import { useChainId, useAccount } from "wagmi";
+import { useEvmBase } from "./hooks/utils/useEvmBase";
 import { useState, useEffect } from 'react';
 
 function AppContent() {
   const [showSwitchSuccess, setShowSwitchSuccess] = useState(false);
   const [networkSwitchCount, setNetworkSwitchCount] = useState(0);
   const [chainChangedFlag, setChainChangedFlag] = useState(0);
-  const chainId = useChainId();
-  const { isConnected } = useAccount();
-  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
-  let actualChainId: number | null = null;
-  if (typeof window !== "undefined" && window.ethereum && typeof window.ethereum.chainId === "string") {
-    try {
-      actualChainId = parseInt(window.ethereum.chainId, 16);
-    } catch {
-      actualChainId = null;
-    }
-  }
-  if (!actualChainId) actualChainId = isConnected ? chainId : 11155420; // Default to OP Sepolia if not connected
-  const networkName = getNetworkName(actualChainId);
-  const isWrongNetwork = isConnected && actualChainId !== 11155420; // Only show warning if wallet is connected and wrong network
+
+  // Use useEvmBase for all EVM network logic
+  const {
+    isWrongNetwork,
+    networkName,
+    singleSupportedNetwork,
+    handleSwitchNetwork,
+  } = useEvmBase();
 
   // Listen for chainChanged event to force re-render
   useEffect(() => {
@@ -61,41 +54,18 @@ function AppContent() {
       {isWrongNetwork && networkSwitchCount < 1 && (
         <div className="fixed top-0 left-0 w-full bg-yellow-900 border-b border-yellow-400 text-yellow-300 py-3 px-4 text-center font-medium z-50" style={{zIndex: 1000}}>
           <span className="mr-2">⚠️</span>
-          You are not connected to OP Sepolia.{' '}
+          You are not connected to {singleSupportedNetwork.name}.{' '}
           <button
             onClick={async () => {
               if (window?.ethereum) {
                 try {
-                  await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0xaa37dc' }], // 0xaa37dc = 11155420
-                  });
+                  await handleSwitchNetwork();
                   setShowSwitchSuccess(true);
                   setTimeout(() => setShowSwitchSuccess(false), 3000);
                   setNetworkSwitchCount((c) => c + 1);
-                } catch (switchError) {
+                } catch {
                   // handle error (e.g., user rejected, not added)
-                  if (
-                    typeof switchError === 'object' &&
-                    switchError !== null &&
-                    'code' in switchError &&
-                    Number((switchError as Record<string, unknown>).code) === 4902
-                  ) {
-                    // Chain not added to MetaMask
-                    await window.ethereum.request({
-                      method: 'wallet_addEthereumChain',
-                      params: [{
-                        chainId: '0xaa37dc',
-                        chainName: 'OP Sepolia',
-                        nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                        rpcUrls: ['https://sepolia.optimism.io'],
-                        blockExplorerUrls: ['https://optimism-sepolia.blockscout.com/'],
-                      }],
-                    });
-                    setShowSwitchSuccess(true);
-                    setTimeout(() => setShowSwitchSuccess(false), 3000);
-                    setNetworkSwitchCount((c) => c + 1);
-                  }
+                  // fallback logic can be added here if needed
                 }
               }
             }}
@@ -103,7 +73,7 @@ function AppContent() {
             style={{ textDecoration: 'underline' }}
             type="button"
           >
-            Switch your EVM wallet to the OP Sepolia network
+            Switch your EVM wallet to the {singleSupportedNetwork.name} network
           </button>
           {' '}to use all features.
         </div>
@@ -111,7 +81,7 @@ function AppContent() {
       {/* Toast for successful network switch */}
       {showSwitchSuccess && (
         <div className="fixed top-4 right-4 bg-green-700 text-white px-6 py-3 rounded shadow-lg z-50 font-medium">
-          Successfully switched to OP Sepolia!
+          Successfully switched to {singleSupportedNetwork.name}!
         </div>
       )}
 
@@ -122,7 +92,7 @@ function AppContent() {
           <div className="mb-16">
             <div className="max-w-4xl">
               <h2 className="text-4xl font-bold text-layerzero-white mb-4 leading-tight">
-                Demo:{" "}
+                Demo: {" "}
                 <span className="text-layerzero-purple-500">
                   Omnichain
                 </span>
@@ -198,7 +168,7 @@ function AppContent() {
                     Connect your {networkName} wallet to interact with ERC-20 tokens
                   </p>
                 </div>
-                <EthereumConnect />
+                <EthereumConnect networkName={networkName} isWrongNetwork={isWrongNetwork} />
               </div>
             </div>
           </div>
@@ -231,7 +201,7 @@ function AppContent() {
                     View your balance and mint OFT tokens on {networkName}
                   </p>
                 </div>
-                <EvmMintCard />
+                <EvmMintCard networkName={networkName} isWrongNetwork={isWrongNetwork} />
               </div>
             </div>
           </div>
@@ -264,7 +234,7 @@ function AppContent() {
                     Transfer tokens from {networkName} to Solana network
                   </p>
                 </div>
-                <EvmToSolanaCard />
+                <EvmToSolanaCard networkName={networkName} isWrongNetwork={isWrongNetwork}  />
               </div>
             </div>
           </div>

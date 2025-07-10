@@ -11,7 +11,7 @@ import { wagmiConfig } from '../config/wagmi'
 
 export function useEvmToSolana() {
   const evmBase = useEvmBase({ networkCheck: 'optimism-sepolia' })
-  const { address, isConnected, isCorrectNetwork, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase
+  const { address, isConnected, chainId, hash, isPending, isConfirming, isConfirmed, error, writeContract, handleSwitchNetwork, handleError } = evmBase
   const wallet = useWallet()
 
   // State management
@@ -128,7 +128,7 @@ export function useEvmToSolana() {
     } catch (error) {
       handleError(error, 'Failed to send tokens')
     }
-  }, [amount, recipientAddress, quoteFee, isCorrectNetwork, writeContract, address, evmBase, handleError])
+  }, [amount, recipientAddress, quoteFee, writeContract, address, evmBase, handleError])
 
   // Format quote fee for display
   const formattedQuoteFee = quoteFee ? formatEther(quoteFee) : null
@@ -139,7 +139,6 @@ export function useEvmToSolana() {
     isConnected,
     
     // Network state
-    isCorrectNetwork,
     chainId,
     
     // Form state

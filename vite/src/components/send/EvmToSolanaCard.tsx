@@ -1,15 +1,10 @@
 import { useEvmToSolana } from '../../hooks/useEvmToSolana'
 import { MessageStatusDisplay } from '../MessageStatusDisplay'
-import { getNetworkName } from '../../utils/network'
-import { useChainId } from 'wagmi'
 
-export default function EvmToSolanaCard() {
-  const chainId = useChainId()
-  const networkName = getNetworkName(chainId)
+export default function EvmToSolanaCard({ networkName, isWrongNetwork }: { networkName: string, isWrongNetwork: boolean }) {
   
   const {
     isConnected,
-    isCorrectNetwork,
     amount,
     setAmount,
     recipientAddress,
@@ -42,7 +37,7 @@ export default function EvmToSolanaCard() {
         </div>
       )}
       
-      {!isCorrectNetwork && (
+      {isWrongNetwork && (
         <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none">
           <div className="flex items-center justify-between">
             <div>
@@ -50,7 +45,7 @@ export default function EvmToSolanaCard() {
                 Wrong Network
               </p>
               <p className="text-xs text-layerzero-gray-400 mt-1">
-                Please switch to OP Sepolia to send tokens
+                Please switch to {networkName} to send tokens
               </p>
             </div>
             <button
@@ -95,10 +90,10 @@ export default function EvmToSolanaCard() {
 
       <button
         onClick={sendTokens}
-        disabled={!isCorrectNetwork || !amount || !recipientAddress || isPending || isConfirming || isQuoting}
+        disabled={isWrongNetwork || !amount || !recipientAddress || isPending || isConfirming || isQuoting}
         className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {!isCorrectNetwork ? 'Switch to OP Sepolia' : 
+        {isWrongNetwork ? `Switch to ${networkName}` : 
          isPending ? 'Confirming...' : 
          isConfirming ? 'Sending...' : 
          isQuoting ? 'Getting quote...' :
@@ -111,10 +106,10 @@ export default function EvmToSolanaCard() {
 
       <button
         onClick={getQuote}
-        disabled={!isCorrectNetwork || isQuoting || !amount || !recipientAddress}
+        disabled={isWrongNetwork || isQuoting || !amount || !recipientAddress}
         className="w-full lz-button disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {!isCorrectNetwork ? 'Wrong Network' : isQuoting ? 'Getting Quote...' : 'Get Quote'}
+        {isWrongNetwork ? 'Wrong Network' : isQuoting ? 'Getting Quote...' : 'Get Quote'}
       </button>
 
       {formattedQuoteFee && (
@@ -159,7 +154,7 @@ export default function EvmToSolanaCard() {
                   rel="noopener noreferrer"
                   className="text-sm text-green-400 underline hover:no-underline"
                 >
-                  View on OP Sepolia Explorer
+                  View on {networkName} Explorer
                 </a>
                 <a 
                   href={`https://testnet.layerzeroscan.com/tx/${hash}`}

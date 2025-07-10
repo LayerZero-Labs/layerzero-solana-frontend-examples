@@ -1,35 +1,21 @@
-import { useAccount, useConnect, useDisconnect, useChainId } from 'wagmi'
-import { optimismSepolia } from 'wagmi/chains'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
-export function EthereumConnect() {
+export function EthereumConnect({ networkName, isWrongNetwork }: { networkName: string, isWrongNetwork: boolean }) {
   const { address, isConnected } = useAccount()
-  const chainId = useChainId()
   const { connectors, connect, status, error } = useConnect()
   const { disconnect } = useDisconnect()
 
-  // Use window.ethereum.chainId if available, otherwise fallback to wagmi's useChainId
-  let actualChainId: number | null = null;
-  if (isConnected && window?.ethereum?.chainId) {
-    try {
-      actualChainId = parseInt(window.ethereum.chainId, 16);
-    } catch {
-      actualChainId = null;
-    }
-  }
-  if (!actualChainId) actualChainId = isConnected ? chainId : 11155420; // Default to OP Sepolia if not connected
-  const isCorrectNetwork = actualChainId === optimismSepolia.id;
-  const networkName = isCorrectNetwork ? 'OP Sepolia' : `Wrong Network (Chain ID: ${actualChainId})`;
 
   if (isConnected) {
     return (
       <div className="space-y-3">
           <div className="text-sm">
             <span className="font-medium text-layerzero-gray-400">Network:</span>{' '}
-            <span className={`font-medium ${isCorrectNetwork ? 'text-green-400' : 'text-red-400'}`}>
+            <span className={`font-medium ${!isWrongNetwork ? 'text-green-400' : 'text-red-400'}`}>
               {networkName}
             </span>
           </div>
-          {!isCorrectNetwork && (
+          {isWrongNetwork && (
             <div className="p-4 bg-layerzero-gray-800 border border-yellow-400 rounded-none mt-2">
               <div className="flex items-center justify-between">
                 <div>
@@ -37,7 +23,7 @@ export function EthereumConnect() {
                     ⚠️ Wrong Network
                   </p>
                   <p className="text-xs text-layerzero-gray-400 mt-1">
-                    Please switch to OP Sepolia to use EVM features
+                    Please switch to {networkName} to use EVM features
                   </p>
                 </div>
                 <button
