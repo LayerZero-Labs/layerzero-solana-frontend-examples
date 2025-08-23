@@ -1,5 +1,5 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { FilePathDisplay } from '../FilePathDisplay'
+import { FilePathDisplay } from '../../FilePathDisplay'
 
 export function EthereumConnect({ networkName, isWrongNetwork }: { networkName: string, isWrongNetwork: boolean }) {
   const { address, isConnected } = useAccount()
@@ -10,7 +10,7 @@ export function EthereumConnect({ networkName, isWrongNetwork }: { networkName: 
   if (isConnected) {
     return (
       <div className="space-y-3">
-          <FilePathDisplay text="/vite/src/components/wallet/EthereumConnect.tsx" />
+          <FilePathDisplay text="/vite/src/components/wallet/evm/EthereumConnect.tsx" />
           <div className="text-sm">
             <span className="font-medium text-layerzero-gray-400">Network:</span>{' '}
             <span className={`font-medium ${!isWrongNetwork ? 'text-green-400' : 'text-red-400'}`}>
@@ -80,7 +80,7 @@ export function EthereumConnect({ networkName, isWrongNetwork }: { networkName: 
 
   return (
     <div className="space-y-3">
-      <FilePathDisplay text="/vite/src/components/wallet/EthereumConnect.tsx" />
+      <FilePathDisplay text="/vite/src/components/wallet/evm/EthereumConnect.tsx" />
       {connectors.map((connector) => (
         <button
           key={connector.uid}
