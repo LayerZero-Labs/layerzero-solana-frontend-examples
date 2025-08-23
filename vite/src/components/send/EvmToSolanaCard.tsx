@@ -24,9 +24,12 @@ export default function EvmToSolanaCard({ networkName, isWrongNetwork }: { netwo
 
   if (!isConnected) {
     return (
-      <p className="text-layerzero-gray-400">
-        Please connect your {networkName} wallet to use this feature.
-      </p>
+      <div className="space-y-4 mb-6">
+        <FilePathDisplay text="/vite/src/components/send/EvmToSolanaCard.tsx" />
+        <p className="text-layerzero-gray-400">
+          Please connect your {networkName} wallet to use this feature.
+        </p>
+      </div>
     )
   }
 
