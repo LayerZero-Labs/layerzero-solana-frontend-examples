@@ -1,6 +1,6 @@
-import { useEvmToSolana } from '../../hooks/useEvmToSolana'
-import { MessageStatusDisplay } from '../MessageStatusDisplay'
-import { FilePathDisplay } from '../FilePathDisplay'
+import { useEvmToSolana } from '../../../hooks/useEvmToSolana'
+import { MessageStatusDisplay } from '../../MessageStatusDisplay'
+import { FilePathDisplay } from '../../FilePathDisplay'
 
 export default function EvmToSolanaCard({ networkName, isWrongNetwork }: { networkName: string, isWrongNetwork: boolean }) {
   
@@ -25,7 +25,7 @@ export default function EvmToSolanaCard({ networkName, isWrongNetwork }: { netwo
   if (!isConnected) {
     return (
       <div className="space-y-4 mb-6">
-        <FilePathDisplay text="/vite/src/components/send/EvmToSolanaCard.tsx" />
+        <FilePathDisplay text="/vite/src/components/send/evm/EvmToSolanaCard.tsx" />
         <p className="text-layerzero-gray-400">
           Please connect your {networkName} wallet to use this feature.
         </p>
@@ -35,7 +35,7 @@ export default function EvmToSolanaCard({ networkName, isWrongNetwork }: { netwo
 
   return (
     <div className="space-y-4 mb-6">
-      <FilePathDisplay text="/vite/src/components/send/EvmToSolanaCard.tsx" />
+      <FilePathDisplay text="/vite/src/components/send/evm/EvmToSolanaCard.tsx" />
       {error && (
         <div className="p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error}

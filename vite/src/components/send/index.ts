@@ -1,2 +1,2 @@
-export { default as SolanaToEvmCard } from './SolanaToEvmCard';
-export { default as EvmToSolanaCard } from './EvmToSolanaCard'; 
+export { default as SolanaToEvmCard } from './solana/SolanaToEvmCard';
+export { default as EvmToSolanaCard } from './evm/EvmToSolanaCard'; 

@@ -1,5 +1,5 @@
-import { useEvmOft } from '../../hooks/useEvmOft'
-import { FilePathDisplay } from '../FilePathDisplay'
+import { useEvmOft } from '../../../hooks/useEvmOft'
+import { FilePathDisplay } from '../../FilePathDisplay'
 
 export default function EvmMintCard({ networkName, isWrongNetwork }: { networkName: string, isWrongNetwork: boolean }) {
   const {
@@ -15,7 +15,7 @@ export default function EvmMintCard({ networkName, isWrongNetwork }: { networkNa
 
   return (
     <div className="space-y-4">
-      <FilePathDisplay text="/vite/src/components/mint/EvmMintCard.tsx" />
+      <FilePathDisplay text="/vite/src/components/mint/evm/EvmMintCard.tsx" />
       {error && (
         <div className="mb-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error}

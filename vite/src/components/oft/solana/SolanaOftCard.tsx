@@ -1,5 +1,5 @@
-import { useSolanaOft } from "../../hooks/useSolanaOft";
-import { FilePathDisplay } from "../FilePathDisplay";
+import { useSolanaOft } from "../../../hooks/useSolanaOft";
+import { FilePathDisplay } from "../../FilePathDisplay";
 
 export default function SolanaOftCard() {
   const {
@@ -21,7 +21,7 @@ export default function SolanaOftCard() {
 
   return (
     <div className="space-y-4">
-        <FilePathDisplay text="/vite/src/components/oft/SolanaOftCard.tsx" />
+        <FilePathDisplay text="/vite/src/components/oft/solana/SolanaOftCard.tsx" />
         {/* Token Information - Always visible */}
         <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
           <h4 className="font-medium text-layerzero-white mb-3">
