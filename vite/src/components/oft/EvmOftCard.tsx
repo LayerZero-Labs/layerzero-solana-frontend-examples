@@ -1,11 +1,13 @@
 import { optimismSepolia } from 'wagmi/chains'
 import { CONTRACTS } from '../../config/contracts'
+import { FilePathDisplay } from '../FilePathDisplay'
 
 export default function EvmOftCard() {
   const SEPOLIA_OFT_ADDRESS = CONTRACTS.SEPOLIA_OFT_ADDRESS as `0x${string}`
 
   return (
     <div className="space-y-4">
+        <FilePathDisplay text="/vite/src/components/oft/EvmOftCard.tsx" />
         {/* Token Information - Always visible */}
         <div className="p-4 bg-layerzero-gray-800 border border-layerzero-gray-700 rounded-none">
           <h4 className="font-medium text-layerzero-white mb-3">

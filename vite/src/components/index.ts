@@ -12,3 +12,6 @@ export * from './send';
 
 // Message status components
 export { MessageStatusDisplay } from './MessageStatusDisplay'; 
+
+// Utility components
+export { FilePathDisplay } from './FilePathDisplay';
