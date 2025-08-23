@@ -97,7 +97,7 @@ export default function SolanaToEvmCard() {
       {nativeFee !== null && !isQuoting && (
         <div className="p-4 bg-layerzero-gray-800 border border-green-400 rounded-none">
           <p className="text-sm text-green-400">
-            <span className="font-medium">Quote Result (Native Fee):</span> {nativeFee.toString()}
+            <span className="font-medium">Quote Result (Native Fee):</span> {nativeFee.toString()} lamports
           </p>
         </div>
       )}
