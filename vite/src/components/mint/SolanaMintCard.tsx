@@ -1,4 +1,5 @@
 import { useSolanaOft } from "../../hooks/useSolanaOft";
+import { FilePathDisplay } from "../FilePathDisplay";
 
 export default function SolanaMintCard() {
   const {
@@ -42,6 +43,7 @@ export default function SolanaMintCard() {
 
   return (
     <div className="space-y-4">
+      <FilePathDisplay text="/vite/src/components/mint/SolanaMintCard.tsx" />
       {error && (
         <div className="mb-4 p-3 bg-layerzero-gray-800 border border-red-400 text-red-400 rounded-none">
           {error}

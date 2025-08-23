@@ -1,5 +1,6 @@
 import { useSolanaToEvm } from '../../hooks/useSolanaToEvm'
 import { MessageStatusDisplay } from '../MessageStatusDisplay'
+import { FilePathDisplay } from '../FilePathDisplay'
 
 export default function SolanaToEvmCard() {
   const {
@@ -22,6 +23,7 @@ export default function SolanaToEvmCard() {
 
   return (
     <div className="space-y-4 mb-6">
+      <FilePathDisplay text="/vite/src/components/send/SolanaToEvmCard.tsx" />
       <div className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-layerzero-white mb-2">

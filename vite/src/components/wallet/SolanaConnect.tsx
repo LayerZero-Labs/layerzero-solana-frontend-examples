@@ -6,6 +6,7 @@ import {
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import { FilePathDisplay } from "../FilePathDisplay";
 
 export const SolanaConnect: FC = () => {
   const { connected, publicKey } = useWallet();
@@ -24,6 +25,7 @@ export const SolanaConnect: FC = () => {
   return (
     <WalletModalProvider>
       <div>
+        <FilePathDisplay text="/vite/src/components/wallet/SolanaConnect.tsx" />
         <style>
           {`
             .wallet-buttons-container {
