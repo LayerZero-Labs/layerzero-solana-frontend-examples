@@ -1,4 +1,3 @@
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -10,15 +9,13 @@ type Props = {
   readonly children: React.ReactNode;
 };
 
-// Mainnet-beta is the actuall mainnet (as of writing)
-const endpoint = clusterApiUrl('mainnet-beta');
-
-const wallets = [new PhantomWalletAdapter()];
+// Use environment variable or default to devnet to match contract deployment
+const endpoint = import.meta.env.VITE_SOLANA_RPC_ENDPOINT || clusterApiUrl('devnet');
 
 export const SolanaWalletProvider: FC<Props> = ({ children }) => {
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={true}>
+      <WalletProvider wallets={[]} autoConnect={true}>
         {children}
       </WalletProvider>
     </ConnectionProvider>

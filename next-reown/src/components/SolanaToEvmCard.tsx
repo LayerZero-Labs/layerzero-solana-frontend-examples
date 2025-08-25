@@ -1,13 +1,15 @@
 "use client";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { oft } from "@layerzerolabs/oft-v2-solana-sdk";
 import { useState, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { EndpointId } from "@layerzerolabs/lz-definitions";
 import { publicKey, transactionBuilder } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { addressToBytes32 } from "@layerzerolabs/lz-v2-utilities";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { addressToBytes32 } from "@layerzerolabs/lz-v2-utilities";
+import { oft } from "@layerzerolabs/oft-v2-solana-sdk";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { toWeb3JsPublicKey } from "@metaplex-foundation/umi-web3js-adapters";
 
 const SEPOLIA_OFT_ADDRESS = process.env.NEXT_PUBLIC_SEPOLIA_OFT_ADDRESS;
 const SOLANA_OFT_MINT_ADDRESS = process.env.NEXT_PUBLIC_SOLANA_OFT_MINT_ADDRESS;
@@ -21,9 +23,7 @@ const SOLANA_PROGRAM_ADDRESS = process.env.NEXT_PUBLIC_SOLANA_PROGRAM_ADDRESS;
 const fromEid = EndpointId.SOLANA_V2_TESTNET;
 const toEid = EndpointId.SEPOLIA_V2_TESTNET;
 
-export default function OftQuote() {
-  const wallet = useWallet();
-
+export const SolanaToEvmCard = () => {
   const [isClient, setIsClient] = useState(false);
   const [nativeFee, setNativeFee] = useState<bigint | null>(null);
 
@@ -31,16 +31,25 @@ export default function OftQuote() {
     setIsClient(true); // Set to true when component mounts (client-side)
   }, []);
 
-  if (!isClient) return null; // Prevent rendering mismatched content
+  const appKitAccount = useAppKitAccount();
+  const { isConnected, allAccounts } = appKitAccount;
+  const solanaAddress = allAccounts.find(account => account.namespace === 'solana')?.address
 
+  if (!isClient) return null; // Prevent rendering mismatched content
 
   const rpcUrl = "https://api.devnet.solana.com";
   const umi = createUmi(rpcUrl);
-  umi.use(walletAdapterIdentity(wallet));
+
+
+  if (!solanaAddress) {
+    return null;
+  }
+
+  umi.use(walletAdapterIdentity({ publicKey: toWeb3JsPublicKey(publicKey(solanaAddress)) }))
 
   async function onClickQuote() {
-    if (!wallet.connected || !wallet.publicKey) {
-      console.error("Wallet is not connected or publicKey is missing.");
+    if (!isConnected || !solanaAddress) {
+      console.error("Wallet is not connected or address is missing.");
       return;
     }
 
@@ -52,9 +61,8 @@ export default function OftQuote() {
       !SOLANA_PROGRAM_ADDRESS
     ) {
       console.error("Missing environment variables.");
-      return
+      return;
     }
-    
 
     const mint = publicKey(SOLANA_OFT_MINT_ADDRESS);
 
@@ -63,7 +71,7 @@ export default function OftQuote() {
     const { nativeFee } = await oft.quote(
       umi.rpc,
       {
-        payer: publicKey(wallet.publicKey),
+        payer: publicKey(solanaAddress),
         tokenMint: mint,
         tokenEscrow: publicKey(SOLANA_ESCROW_ADDRESS),
       },
@@ -80,35 +88,13 @@ export default function OftQuote() {
         oft: publicKey(SOLANA_PROGRAM_ADDRESS),
       }
     );
-    setNativeFee(nativeFee)
+    setNativeFee(nativeFee);
   }
 
   return (
-    <div className="py-5">
-
-      <div className="my-4" />
-
-      <p>Sepolia OFT Token Contract Address: {SEPOLIA_OFT_ADDRESS}</p>
-      <p>Solana OFT Mint Address: {SOLANA_OFT_MINT_ADDRESS}</p>
-      <p>Solana Escrow Address: {SOLANA_ESCROW_ADDRESS}</p>
-
-      <div className="my-4" />
-
-      <p>(Harcoded) Sepolia address: {SEPOLIA_WALLET}</p>
-      <p>Connected Solana address: {wallet.publicKey?.toBase58()} </p>
-
-      <div className="my-4" />
-
-      <p>(Hardcoded) Amount: {amount}</p>
-
-      <button
-        className="my-4 py-4 px-8 bg-blue-500 text-white rounded"
-        onClick={onClickQuote}
-      >
-        OFT Quote
-      </button>
-
+    <div>
       <p>Quote result (nativeFee): {nativeFee}</p>
+      <button onClick={onClickQuote}>OFT Quote</button>
     </div>
   );
-}
+};
